@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Segnapunti</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --bg-card: #ffffff;
+      --text: #111827;
+      --text-muted: #6b7280;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --border: #e5e7eb;
+      --danger: #dc2626;
+      --control-bg: #ffffff;
+      --control-border: #d1d5db;
+      --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.08);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #020617;
+        --bg-card: #020617;
+        --text: #e5e7eb;
+        --text-muted: #9ca3af;
+        --accent: #3b82f6;
+        --accent-soft: #1d283a;
+        --border: #111827;
+        --danger: #f87171;
+        --control-bg: #020617;
+        --control-border: #1f2933;
+        --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.65);
+      }
+    }
+
+    body.light-theme {
+      --bg: #f5f5f7;
+      --bg-card: #ffffff;
+      --text: #111827;
+      --text-muted: #6b7280;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --border: #e5e7eb;
+      --danger: #dc2626;
+      --control-bg: #ffffff;
+      --control-border: #d1d5db;
+      --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.08);
+    }
+
+    body.dark-theme {
+      --bg: #020617;
+      --bg-card: #020617;
+      --text: #e5e7eb;
+      --text-muted: #9ca3af;
+      --accent: #3b82f6;
+      --accent-soft: #1d283a;
+      --border: #111827;
+      --danger: #f87171;
+      --control-bg: #020617;
+      --control-border: #1f2933;
+      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.65);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      background: radial-gradient(circle at top, rgba(37, 99, 235, 0.12), transparent 55%), var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .page-wrapper {
+      width: 100%;
+      max-width: 1024px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .page-title {
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      font-size: 22px;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .app-shell {
+      width: 100%;
+      background: var(--bg-card);
+      border-radius: 16px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(90deg, rgba(37,99,235,0.08), transparent);
+      gap: 8px;
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--control-bg);
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .theme-toggle span.icon { font-size: 16px; }
+
+    .theme-toggle:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .app-body {
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+    }
+
+    #setupContainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 8px 18px;
+      align-items: flex-end;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field-group label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .field-group select,
+    .field-group input[type="text"] {
+      padding: 7px 9px;
+      border-radius: 8px;
+      border: 1px solid var(--control-border);
+      background: var(--control-bg);
+      color: var(--text);
+      font-size: 14px;
+      width: 100%;
+    }
+
+    .field-group select:focus,
+    .field-group input[type="text"]:focus {
+      outline: 2px solid var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    #nomiContainer {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 6px 12px;
+      margin-top: 4px;
+    }
+
+    .nome-input {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .nome-input label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .primary-btn,
+    .ghost-btn,
+    .danger-btn {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s, border-color 0.2s, transform 0.05s;
+    }
+
+    .primary-btn {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 6px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    .primary-btn:hover {
+      background: #1d4ed8;
+      transform: translateY(-0.5px);
+    }
+
+    .ghost-btn {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .ghost-btn:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .danger-btn {
+      background: transparent;
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .danger-btn:hover {
+      background: rgba(248, 113, 113, 0.1);
+    }
+
+    .btn-icon { font-size: 14px; }
+
+    .setup-actions {
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+
+    #tabellaContainer {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(15,23,42,0.03), transparent);
+      min-height: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 420px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: center;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    th {
+      background: rgba(15, 23, 42, 0.03);
+      font-weight: 600;
+    }
+
+    tfoot td {
+      font-weight: 600;
+      background: rgba(37, 99, 235, 0.06);
+    }
+
+    td:first-child,
+    th:first-child {
+      text-align: left;
+      padding-left: 14px;
+      white-space: nowrap;
+    }
+
+    select.score-select {
+      padding: 5px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--control-border);
+      background: var(--control-bg);
+      font-size: 13px;
+      color: var(--text);
+      min-width: 48px;
+      cursor: pointer;
+    }
+
+    select.score-select:focus {
+      outline: 2px solid var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    #controls {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 10px;
+      }
+      .app-body {
+        padding: 10px 10px 12px;
+      }
+      table {
+        min-width: 360px;
+      }
+      .setup-actions {
+        justify-content: flex-start;
+      }
+    }
+
+    /* orientamento: stringiamo un po' in portrait per avere più spazio verticale */
+    @media screen and (max-width: 768px) and (orientation: portrait) {
+      .app-shell {
+        max-height: 100vh;
+      }
+      .app-body {
+        padding-bottom: 10px;
+      }
+    }
+
+    /* landscape mobile: più spazio orizzontale, manteniamo flex e grid */
+    @media screen and (max-width: 900px) and (orientation: landscape) {
+      .app-body {
+        flex-direction: column;
+      }
+      #setupContainer {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="page-title">SEGNAPUNTI</div>
+
+    <div class="app-shell">
+      <header class="app-header">
+        <button id="themeToggle" class="theme-toggle" type="button">
+          <span class="icon" id="themeIcon">🌙</span>
+          <span id="themeLabel">Tema sistema</span>
+        </button>
+      </header>
+
+      <main class="app-body">
+        <!-- SETUP -->
+        <div id="setupContainer">
+          <div class="field-group">
+            <label for="numPartecipanti">Numero partecipanti</label>
+            <select id="numPartecipanti">
+              <!-- 1-10 -->
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label for="numPartite">Numero partite</label>
+            <select id="numPartite">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+          </div>
+
+          <div class="setup-actions">
+            <button id="generaNomi" class="ghost-btn" type="button">
+              <span class="btn-icon">👤</span> Nomi giocatori
+            </button>
+            <button id="generaTabella" class="primary-btn" type="button">
+              <span class="btn-icon">▶️</span> Inizia partita
+            </button>
+          </div>
+
+          <div id="nomiContainer"></div>
+        </div>
+
+        <!-- TABELLA -->
+        <div id="tabellaContainer"></div>
+
+        <!-- CONTROLLI FOOTER -->
+        <div id="controls" style="display:none;">
+          <button id="nuovaPartitaBtn" class="ghost-btn" type="button">
+            <span class="btn-icon">➕</span> Nuova partita
+          </button>
+          <button id="resetBtn" class="danger-btn" type="button">
+            <span class="btn-icon">♻️</span> Reset completo
+          </button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const numPartecipantiInput = document.getElementById('numPartecipanti');
+    const numPartiteInput = document.getElementById('numPartite');
+    const generaNomiBtn = document.getElementById('generaNomi');
+    const generaTabellaBtn = document.getElementById('generaTabella');
+    const nomiContainer = document.getElementById('nomiContainer');
+    const tabellaContainer = document.getElementById('tabellaContainer');
+    const setupContainer = document.getElementById('setupContainer');
+    const controlsDiv = document.getElementById('controls');
+    const nuovaPartitaBtn = document.getElementById('nuovaPartitaBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    let nomiCorrenti = [];
+    let numPartecipantiCorrente = 0;
+
+    generaNomiBtn.addEventListener('click', () => {
+      const n = parseInt(numPartecipantiInput.value, 10);
+      nomiContainer.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        const div = document.createElement('div');
+        div.className = 'nome-input';
+        const label = document.createElement('label');
+        label.textContent = 'Nome partecipante ' + (i + 1);
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'nome_' + i;
+        input.placeholder = 'Partecipante ' + (i + 1);
+        div.appendChild(label);
+        div.appendChild(input);
+        nomiContainer.appendChild(div);
+      }
+    });
+
+    generaTabellaBtn.addEventListener('click', () => {
+      const nPartecipanti = parseInt(numPartecipantiInput.value, 10);
+      const nPartite = parseInt(numPartiteInput.value, 10);
+
+      const nomi = [];
+      for (let i = 0; i < nPartecipanti; i++) {
+        const input = document.getElementById('nome_' + i);
+        const nome = (input && input.value.trim()) ? input.value.trim() : ('Partecipante ' + (i + 1));
+        nomi.push(nome);
+      }
+
+      nomiCorrenti = nomi;
+      numPartecipantiCorrente = nPartecipanti;
+
+      generaTabella(nomiCorrenti, nPartite);
+
+      setupContainer.style.display = 'none';
+      controlsDiv.style.display = 'flex';
+    });
+
+    function generaTabella(nomi, nPartite) {
+      tabellaContainer.innerHTML = '';
+
+      const nPartecipanti = nomi.length;
+
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const tbody = document.createElement('tbody');
+      const tfoot = document.createElement('tfoot');
+
+      const headerRow = document.createElement('tr');
+      const thVuoto = document.createElement('th');
+      thVuoto.textContent = 'Partita';
+      headerRow.appendChild(thVuoto);
+
+      nomi.forEach(nome => {
+        const th = document.createElement('th');
+        th.textContent = nome;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+
+      for (let r = 0; r < nPartite; r++) {
+        const tr = document.createElement('tr');
+
+        const tdLabel = document.createElement('td');
+        tdLabel.textContent = 'Partita ' + (r + 1);
+        tr.appendChild(tdLabel);
+
+        for (let c = 0; c < nPartecipanti; c++) {
+          const td = document.createElement('td');
+          const select = document.createElement('select');
+          select.className = 'score-select col-' + c;
+
+          for (let val = 0; val <= 8; val++) {
+            const opt = document.createElement('option');
+            opt.value = val;
+            opt.textContent = val;
+            select.appendChild(opt);
+          }
+
+          select.addEventListener('change', aggiornaTotali);
+
+          td.appendChild(select);
+          tr.appendChild(td);
+        }
+
+        tbody.appendChild(tr);
+      }
+
+      const trTotale = document.createElement('tr');
+      const tdLabelTot = document.createElement('td');
+      tdLabelTot.textContent = 'Totale';
+      trTotale.appendChild(tdLabelTot);
+
+      for (let c = 0; c < nPartecipanti; c++) {
+        const td = document.createElement('td');
+        td.id = 'totale_col_' + c;
+        td.textContent = '0';
+        trTotale.appendChild(td);
+      }
+      tfoot.appendChild(trTotale);
+
+      table.appendChild(thead);
+      table.appendChild(tbody);
+      table.appendChild(tfoot);
+      tabellaContainer.appendChild(table);
+
+      aggiornaTotali();
+    }
+
+    nuovaPartitaBtn.addEventListener('click', () => {
+      if (!nomiCorrenti.length) return;
+      const nuovoNumero = prompt('Quante partite vuoi giocare? (1-10)');
+      const nPartite = parseInt(nuovoNumero, 10);
+      if (!nPartite || nPartite < 1 || nPartite > 10) return;
+      generaTabella(nomiCorrenti, nPartite);
+    });
+
+    resetBtn.addEventListener('click', () => {
+      nomiCorrenti = [];
+      numPartecipantiCorrente = 0;
+      tabellaContainer.innerHTML = '';
+      nomiContainer.innerHTML = '';
+      numPartecipantiInput.value = '2';
+      numPartiteInput.value = '3';
+      setupContainer.style.display = 'grid';
+      controlsDiv.style.display = 'none';
+    });
+
+    function aggiornaTotali() {
+      const nPartecipanti = numPartecipantiCorrente || parseInt(numPartecipantiInput.value, 10) || 0;
+      for (let c = 0; c < nPartecipanti; c++) {
+        const selects = document.querySelectorAll('select.col-' + c);
+        let sum = 0;
+        selects.forEach(sel => {
+          sum += parseInt(sel.value || '0', 10);
+        });
+        const tdTot = document.getElementById('totale_col_' + c);
+        if (tdTot) tdTot.textContent = sum;
+      }
+    }
+
+    // Tema
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeLabel = document.getElementById('themeLabel');
+
+    function getSystemTheme() {
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+    }
+
+    function applyTheme(theme, fromSystem = false) {
+      document.body.classList.remove('light-theme', 'dark-theme');
+      if (theme === 'light') {
+        document.body.classList.add('light-theme');
+        themeIcon.textContent = '🌙';
+        themeLabel.textContent = fromSystem ? 'Tema sistema (chiaro)' : 'Tema chiaro';
+      } else {
+        document.body.classList.add('dark-theme');
+        themeIcon.textContent = '☀️';
+        themeLabel.textContent = fromSystem ? 'Tema sistema (scuro)' : 'Tema scuro';
+      }
+    }
+
+    function initTheme() {
+      const stored = localStorage.getItem('segnapunti-theme');
+      if (stored === 'light' || stored === 'dark') {
+        applyTheme(stored, false);
+      } else {
+        const system = getSystemTheme();
+        applyTheme(system, true);
+      }
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      const current = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next, false);
+      localStorage.setItem('segnapunti-theme', next);
+    });
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      const stored = localStorage.getItem('segnapunti-theme');
+      if (stored === 'light' || stored === 'dark') return;
+      const systemTheme = e.matches ? 'dark' : 'light';
+      applyTheme(systemTheme, true);
+    });
+
+    initTheme();
+  </script>
+</body>
+</html>
