@@ -4,78 +4,76 @@
   <meta charset="UTF-8">
   <title>Segnapunti</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Font Google (puoi anche hostarli localmente) -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Palette ispirata a Hearthstone */
-      --bg: #2b1b11;          /* marrone scuro */
-      --bg-card: #f2dfc0;     /* pergamena chiara */
-      --bg-card-inner: #f8efe0;
+      --bg: #24160f;
+      --bg-card: #f2dfc0;
+      --bg-card-inner: #f7ebd3;
       --text: #2b1b11;
       --text-muted: #7a6350;
-      --accent: #f4a462;      /* oro/arancio */
+      --accent: #f4a462;
       --accent-strong: #e48835;
-      --accent-soft: #fbe1bf;
-      --accent-secondary: #2a9d90; /* turchese */
+      --accent-soft: #f4c58b;
+      --accent-secondary: #2a9d90;
       --border: #7e4c3a;
       --danger: #c0392b;
-      --control-bg: #f8efe0;
+      --control-bg: #f7ebd3;
       --control-border: #c9a57d;
-      --shadow-soft: 0 16px 40px rgba(0, 0, 0, 0.45);
+      --shadow-soft: 0 14px 30px rgba(0, 0, 0, 0.6);
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #120b08;
+        --bg: #140c08;
         --bg-card: #3a2415;
-        --bg-card-inner: #241610;
-        --text: #f5e8d4;
-        --text-muted: #c9a57d;
+        --bg-card-inner: #2b1a11;
+        --text: #f6ebd6;
+        --text-muted: #d0b48e;
         --accent: #f4a462;
         --accent-strong: #ffb862;
         --accent-soft: #7e4c3a;
         --accent-secondary: #39c4b8;
         --border: #7e4c3a;
         --danger: #ff6b6b;
-        --control-bg: #271913;
+        --control-bg: #2b1a11;
         --control-border: #7e4c3a;
-        --shadow-soft: 0 18px 50px rgba(0, 0, 0, 0.9);
+        --shadow-soft: 0 16px 40px rgba(0, 0, 0, 0.9);
       }
     }
 
     body.light-theme {
-      --bg: #2b1b11;
+      --bg: #24160f;
       --bg-card: #f2dfc0;
-      --bg-card-inner: #f8efe0;
+      --bg-card-inner: #f7ebd3;
       --text: #2b1b11;
       --text-muted: #7a6350;
       --accent: #f4a462;
       --accent-strong: #e48835;
-      --accent-soft: #fbe1bf;
+      --accent-soft: #f4c58b;
       --accent-secondary: #2a9d90;
       --border: #7e4c3a;
       --danger: #c0392b;
-      --control-bg: #f8efe0;
+      --control-bg: #f7ebd3;
       --control-border: #c9a57d;
-      --shadow-soft: 0 16px 40px rgba(0, 0, 0, 0.45);
+      --shadow-soft: 0 14px 30px rgba(0, 0, 0, 0.6);
     }
 
     body.dark-theme {
-      --bg: #120b08;
+      --bg: #140c08;
       --bg-card: #3a2415;
-      --bg-card-inner: #241610;
-      --text: #f5e8d4;
-      --text-muted: #c9a57d;
+      --bg-card-inner: #2b1a11;
+      --text: #f6ebd6;
+      --text-muted: #d0b48e;
       --accent: #f4a462;
       --accent-strong: #ffb862;
       --accent-soft: #7e4c3a;
       --accent-secondary: #39c4b8;
       --border: #7e4c3a;
       --danger: #ff6b6b;
-      --control-bg: #271913;
+      --control-bg: #2b1a11;
       --control-border: #7e4c3a;
-      --shadow-soft: 0 18px 50px rgba(0, 0, 0, 0.9);
+      --shadow-soft: 0 16px 40px rgba(0, 0, 0, 0.9);
     }
 
     * { box-sizing: border-box; }
@@ -84,10 +82,7 @@
       margin: 0;
       min-height: 100vh;
       font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background:
-        radial-gradient(circle at top, rgba(255, 215, 128, 0.22), transparent 55%),
-        radial-gradient(circle at bottom, rgba(42, 157, 144, 0.18), transparent 55%),
-        var(--bg);
+      background: var(--bg);
       color: var(--text);
       display: flex;
       align-items: stretch;
@@ -100,7 +95,7 @@
       max-width: 1200px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 10px;
       align-items: center;
     }
 
@@ -112,17 +107,14 @@
       font-size: 22px;
       text-transform: uppercase;
       color: #f8e1a8;
-      text-shadow: 0 3px 6px rgba(0, 0, 0, 0.6);
     }
 
     .app-shell {
       width: 100%;
-      background: radial-gradient(circle at top, #f8e1a8 0, var(--bg-card) 40%, var(--bg-card-inner) 100%);
-      border-radius: 28px;
-      box-shadow:
-        0 0 0 3px rgba(0, 0, 0, 0.3),
-        0 18px 40px rgba(0, 0, 0, 0.75);
-      border: 4px solid #a66a33;
+      background: var(--bg-card);
+      border-radius: 24px;
+      box-shadow: var(--shadow-soft);
+      border: 3px solid #8f5a32;
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -133,49 +125,55 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      padding: 10px 16px;
-      border-bottom: 3px solid rgba(0, 0, 0, 0.25);
-      background: linear-gradient(90deg, rgba(244,164,98,0.45), rgba(42,157,144,0.15));
+      padding: 8px 14px;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+      background: var(--bg-card-inner);
     }
 
     .theme-toggle {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 6px 12px;
+      gap: 6px;
+      padding: 5px 10px;
       border-radius: 999px;
-      border: 2px solid rgba(0,0,0,0.45);
-      background: radial-gradient(circle at top, #fbe1bf, var(--accent-soft));
-      color: #4b2e15;
-      font-size: 12px;
+      border: 1px solid rgba(0,0,0,0.4);
+      background: var(--accent-soft);
+      color: #2b1b11;
+      font-size: 11px;
       cursor: pointer;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.5);
       transition: transform 0.07s, box-shadow 0.07s, filter 0.15s;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.4);
     }
 
-    .theme-toggle span.icon { font-size: 16px; }
+    .theme-toggle span.icon { font-size: 14px; }
 
-    .theme-toggle:hover {
-      filter: brightness(1.03);
-    }
+    .theme-toggle:hover { filter: brightness(1.03); }
 
     .theme-toggle:active {
       transform: translateY(1px);
-      box-shadow: 0 1px 0 rgba(0,0,0,0.6);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.5);
     }
 
     .app-body {
-      padding: 14px 16px 16px;
+      padding: 12px 14px 14px;
       display: flex;
       flex-direction: column;
       gap: 12px;
       min-height: 0;
+      background: var(--bg-card-inner);
     }
 
+    /* SETUP */
     #setupContainer {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 8px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .setup-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
       align-items: flex-end;
     }
 
@@ -183,24 +181,25 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
+      min-width: 160px;
+      flex: 1 1 160px;
+      max-width: 260px;
     }
 
     .field-group label {
       font-size: 13px;
       color: var(--text-muted);
-      text-shadow: 0 1px 0 rgba(255,255,255,0.3);
     }
 
     .field-group select,
     .field-group input[type="text"] {
       padding: 7px 9px;
       border-radius: 999px;
-      border: 2px solid rgba(0,0,0,0.4);
-      background: radial-gradient(circle at top, #fff5e4, var(--control-bg));
+      border: 1px solid var(--control-border);
+      background: var(--control-bg);
       color: var(--text);
       font-size: 14px;
       width: 100%;
-      box-shadow: inset 0 2px 0 rgba(255,255,255,0.8);
     }
 
     .field-group select:focus,
@@ -210,7 +209,6 @@
     }
 
     #nomiContainer {
-      grid-column: 1 / -1;
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 6px 12px;
@@ -233,7 +231,7 @@
     .danger-btn {
       padding: 7px 16px;
       border-radius: 999px;
-      border: 2px solid rgba(0,0,0,0.6);
+      border: 1px solid rgba(0,0,0,0.4);
       font-size: 13px;
       cursor: pointer;
       display: inline-flex;
@@ -241,51 +239,58 @@
       justify-content: center;
       gap: 6px;
       white-space: nowrap;
-      box-shadow: 0 3px 0 rgba(0,0,0,0.65);
-      transition: transform 0.07s, box-shadow 0.07s, filter 0.15s;
+      transition: transform 0.07s, box-shadow 0.07s, filter 0.15s, background 0.15s;
     }
 
     .primary-btn {
-      background: radial-gradient(circle at top, #ffe6b3, var(--accent));
+      background: var(--accent);
       color: #3b220e;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.3);
     }
 
-    .primary-btn:hover { filter: brightness(1.05); }
-
     .ghost-btn {
-      background: radial-gradient(circle at top, #fdf4da, var(--accent-soft));
+      background: var(--bg-card-inner);
       color: #3b220e;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.1);
     }
 
     .danger-btn {
-      background: radial-gradient(circle at top, #ffd2c7, #d1513f);
+      background: #e36b5a;
       color: #220806;
+      box-shadow: 0 2px 0 rgba(0,0,0,0.3);
     }
+
+    .primary-btn:hover { filter: brightness(1.05); }
+    .ghost-btn:hover { background: #f0e1c9; }
+    .danger-btn:hover { filter: brightness(1.03); }
 
     .primary-btn:active,
     .ghost-btn:active,
     .danger-btn:active {
       transform: translateY(1px);
-      box-shadow: 0 1px 0 rgba(0,0,0,0.8);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.4);
     }
 
-    .btn-icon { font-size: 14px; }
+    .btn-icon {
+      font-size: 12px;
+      font-weight: 600;
+      color: #000;
+    }
 
     .setup-actions {
       display: flex;
-      flex-direction: row;
-      gap: 8px;
       flex-wrap: wrap;
+      gap: 8px;
       justify-content: flex-start;
+      margin-top: 4px;
     }
 
+    /* TABELLONE */
     #tabellaContainer {
       overflow-x: auto;
-      border-radius: 18px;
-      border: 3px solid rgba(0,0,0,0.55);
-      background:
-        radial-gradient(circle at top, rgba(255,255,255,0.4), transparent 65%),
-        linear-gradient(180deg, rgba(250,236,205,0.85), rgba(230,201,160,0.95));
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.2);
+      background: var(--bg-card-inner);
       min-height: 0;
     }
 
@@ -296,25 +301,22 @@
     }
 
     th, td {
-      border-bottom: 2px solid rgba(0,0,0,0.25);
+      border-bottom: 1px solid rgba(0,0,0,0.15);
       padding: 9px 10px;
       text-align: center;
       font-size: 13px;
       white-space: nowrap;
-      color: #2b1b11;
-      text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+      color: var(--text);
     }
 
     th {
-      background: linear-gradient(180deg, #fbe8be, #f0cf8b);
+      background: #e3c89a;
       font-weight: 600;
-      box-shadow: 0 2px 0 rgba(0,0,0,0.35);
     }
 
     tfoot td {
       font-weight: 600;
-      background: linear-gradient(180deg, #f1d59a, #e0b568);
-      box-shadow: 0 -2px 0 rgba(0,0,0,0.35);
+      background: #d9b87f;
     }
 
     td:first-child,
@@ -327,13 +329,12 @@
     select.score-select {
       padding: 5px 9px;
       border-radius: 999px;
-      border: 2px solid rgba(0,0,0,0.4);
-      background: radial-gradient(circle at top, #fff5e0, #f6d7a3);
+      border: 1px solid var(--control-border);
+      background: var(--control-bg);
       font-size: 13px;
-      color: #2b1b11;
+      color: var(--text);
       min-width: 50px;
       cursor: pointer;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
     }
 
     select.score-select:focus {
@@ -349,7 +350,15 @@
       margin-top: 8px;
     }
 
-    /* Mobile */
+    /* FOOTER COPYRIGHT */
+    .page-footer {
+      font-size: 11px;
+      color: #bba48b;
+      text-align: center;
+      opacity: 0.85;
+    }
+
+    /* Responsive */
     @media (max-width: 640px) {
       body { padding: 10px; }
       .page-title { font-size: 18px; }
@@ -357,58 +366,26 @@
       table { min-width: 360px; }
     }
 
-    /* Desktop medio (laptop, 1024+) */
     @media (min-width: 1024px) {
-      body {
-        padding: 24px;
-      }
-      .page-wrapper {
-        max-width: 1300px;
-      }
-      .page-title {
-        font-size: 26px;
-      }
-      .app-body {
-        padding: 18px 22px 20px;
-        gap: 16px;
-      }
-      th, td {
-        font-size: 14px;
-        padding: 10px 12px;
-      }
+      body { padding: 24px; }
+      .page-wrapper { max-width: 1300px; }
+      .page-title { font-size: 26px; }
+      .app-body { padding: 16px 20px 18px; gap: 16px; }
+      th, td { font-size: 14px; padding: 10px 12px; }
     }
 
-    /* Desktop grande (27"+) */
     @media (min-width: 1440px) {
-      body {
-        padding: 32px;
-      }
-      .page-wrapper {
-        max-width: 1400px;
-      }
-      .page-title {
-        font-size: 30px;
-      }
-      .app-body {
-        padding: 22px 26px 24px;
-      }
-      table {
-        min-width: 600px;
-      }
-      th, td {
-        font-size: 15px;
-        padding: 11px 14px;
-      }
+      body { padding: 32px; }
+      .page-wrapper { max-width: 1400px; }
+      .page-title { font-size: 30px; }
+      .app-body { padding: 20px 24px 22px; }
+      table { min-width: 600px; }
+      th, td { font-size: 15px; padding: 11px 14px; }
       .field-group select,
-      .field-group input[type="text"] {
-        font-size: 15px;
-      }
+      .field-group input[type="text"] { font-size: 15px; }
       .primary-btn,
       .ghost-btn,
-      .danger-btn {
-        font-size: 14px;
-        padding-inline: 18px;
-      }
+      .danger-btn { font-size: 14px; padding-inline: 18px; }
     }
 
     @media screen and (max-width: 768px) and (orientation: portrait) {
@@ -418,9 +395,7 @@
 
     @media screen and (max-width: 900px) and (orientation: landscape) {
       .app-body { flex-direction: column; }
-      #setupContainer {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      }
+      .setup-row { flex-wrap: wrap; }
     }
   </style>
 </head>
@@ -431,7 +406,7 @@
     <div class="app-shell">
       <header class="app-header">
         <button id="themeToggle" class="theme-toggle" type="button">
-          <span class="icon" id="themeIcon">🌙</span>
+          <span class="icon" id="themeIcon">☾</span>
           <span id="themeLabel">Tema sistema</span>
         </button>
       </header>
@@ -439,45 +414,47 @@
       <main class="app-body">
         <!-- SETUP -->
         <div id="setupContainer">
-          <div class="field-group">
-            <label for="numPartecipanti">Numero partecipanti</label>
-            <select id="numPartecipanti">
-              <option value="1">1</option>
-              <option value="2" selected>2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-            </select>
-          </div>
+          <div class="setup-row">
+            <div class="field-group">
+              <label for="numPartecipanti">Numero partecipanti</label>
+              <select id="numPartecipanti">
+                <option value="1">1</option>
+                <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select>
+            </div>
 
-          <div class="field-group">
-            <label for="numPartite">Numero partite</label>
-            <select id="numPartite">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3" selected>3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-              <option value="10">10</option>
-            </select>
-          </div>
+            <div class="field-group">
+              <label for="numPartite">Numero partite</label>
+              <select id="numPartite">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select>
+            </div>
 
-          <div class="setup-actions">
-            <button id="generaNomi" class="ghost-btn" type="button">
-              <span class="btn-icon">👤</span> Nomi giocatori
-            </button>
-            <button id="generaTabella" class="primary-btn" type="button">
-              <span class="btn-icon">▶️</span> Inizia partita
-            </button>
+            <div class="setup-actions">
+              <button id="generaNomi" class="ghost-btn" type="button">
+                <span class="btn-icon">◎</span> Nomi giocatori
+              </button>
+              <button id="generaTabella" class="primary-btn" type="button">
+                <span class="btn-icon">►</span> Inizia partita
+              </button>
+            </div>
           </div>
 
           <div id="nomiContainer"></div>
@@ -489,13 +466,18 @@
         <!-- CONTROLLI FOOTER -->
         <div id="controls" style="display:none;">
           <button id="nuovaPartitaBtn" class="ghost-btn" type="button">
-            <span class="btn-icon">➕</span> Nuova partita
+            <span class="btn-icon">＋</span> Nuova partita
           </button>
           <button id="resetBtn" class="danger-btn" type="button">
-            <span class="btn-icon">♻️</span> Reset completo
+            <span class="btn-icon">↺</span> Reset completo
           </button>
         </div>
       </main>
+    </div>
+
+    <!-- FOOTER COPYRIGHT -->
+    <div class="page-footer">
+      &copy; Massimiliano Piazza
     </div>
   </div>
 
@@ -638,7 +620,7 @@
       nomiContainer.innerHTML = '';
       numPartecipantiInput.value = '2';
       numPartiteInput.value = '3';
-      setupContainer.style.display = 'grid';
+      setupContainer.style.display = 'flex';
       controlsDiv.style.display = 'none';
     });
 
@@ -655,7 +637,6 @@
       }
     }
 
-    // Tema
     const themeToggleBtn = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
     const themeLabel = document.getElementById('themeLabel');
@@ -670,11 +651,11 @@
       document.body.classList.remove('light-theme', 'dark-theme');
       if (theme === 'light') {
         document.body.classList.add('light-theme');
-        themeIcon.textContent = '🌙';
+        themeIcon.textContent = '☾';
         themeLabel.textContent = fromSystem ? 'Tema sistema (chiaro)' : 'Tema chiaro';
       } else {
         document.body.classList.add('dark-theme');
-        themeIcon.textContent = '☀️';
+        themeIcon.textContent = '☼';
         themeLabel.textContent = fromSystem ? 'Tema sistema (scuro)' : 'Tema scuro';
       }
     }
