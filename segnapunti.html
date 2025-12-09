@@ -792,16 +792,17 @@
     });
 
     risultatiBtn.addEventListener('click', () => {
-      if (!totaliCorrenti.length || !nomiCorrenti.length) return;
+  if (!totaliCorrenti.length || !nomiCorrenti.length) return;
 
-      const max = Math.max(...totaliCorrenti);
-      const winnerIndex = totaliCorrenti.indexOf(max);
-      const winnerName = nomiCorrenti[winnerIndex] || ('Partecipante ' + (winnerIndex + 1));
+  const min = Math.min(...totaliCorrenti);
+  const winnerIndex = totaliCorrenti.indexOf(min);
+  const winnerName = nomiCorrenti[winnerIndex] || ('Partecipante ' + (winnerIndex + 1));
 
-      risultatiTesto.textContent = `Vincitore: ${winnerName} con ${max} punti`;
-      risultatiOverlay.style.display = 'flex';
-      lanciaConfetti();
-    });
+  risultatiTesto.textContent = `Vincitore: ${winnerName} con ${min} punti`;
+  risultatiOverlay.style.display = 'flex';
+  lanciaConfetti();
+});
+
 
     chiudiRisultatiBtn.addEventListener('click', () => {
       risultatiOverlay.style.display = 'none';
