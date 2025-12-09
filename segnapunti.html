@@ -113,7 +113,6 @@
       color: #f8e1a8;
     }
 
-    /* Cornice legno intorno all'app */
     .frame {
       width: 100%;
       border-radius: 24px;
@@ -164,7 +163,6 @@
     .theme-toggle span.icon { font-size: 14px; }
 
     .theme-toggle:hover { background: #e9d7b7; }
-
     body.dark-theme .theme-toggle:hover { background: #3a2415; }
 
     .theme-toggle:active { transform: translateY(1px); }
@@ -178,7 +176,6 @@
       background: var(--bg-card-inner);
     }
 
-    /* SETUP */
     #setupContainer {
       display: flex;
       flex-direction: column;
@@ -296,7 +293,6 @@
       margin-top: 4px;
     }
 
-    /* TABELLONE */
     #tabellaContainer {
       overflow-x: auto;
       border-radius: 14px;
@@ -330,7 +326,6 @@
       background: #d9b87f;
     }
 
-    /* header e footer tabella in dark mode più leggibili */
     body.dark-theme th {
       background: #4b2e1a;
       color: #fbe7c4;
@@ -372,7 +367,6 @@
       margin-top: 8px;
     }
 
-    /* FOOTER COPYRIGHT */
     .page-footer {
       font-size: 11px;
       color: #bba48b;
@@ -380,7 +374,6 @@
       opacity: 0.85;
     }
 
-    /* overlay risultati */
     .risultati-overlay {
       position: fixed;
       inset: 0;
@@ -407,7 +400,6 @@
       margin-bottom: 12px;
     }
 
-    /* coriandoli */
     #confetti-container {
       position: fixed;
       inset: 0;
@@ -428,7 +420,6 @@
       100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
     }
 
-    /* bottoni dark più leggibili */
     body.dark-theme .primary-btn {
       background: #f4a462;
       color: #1b1008;
@@ -451,7 +442,6 @@
     body.dark-theme .ghost-btn:hover { background: #4a2e1d; }
     body.dark-theme .danger-btn:hover { background: #f17866; }
 
-    /* Responsive */
     @media (max-width: 640px) {
       body { padding: 10px; }
       .page-title { font-size: 18px; }
@@ -506,7 +496,6 @@
         </header>
 
         <main class="app-body">
-          <!-- SETUP -->
           <div id="setupContainer">
             <div class="setup-row">
               <div class="field-group">
@@ -554,10 +543,8 @@
             <div id="nomiContainer"></div>
           </div>
 
-          <!-- TABELLA -->
           <div id="tabellaContainer"></div>
 
-          <!-- CONTROLLI FOOTER -->
           <div id="controls" style="display:none;">
             <button id="nuovaPartitaBtn" class="ghost-btn" type="button">
               <span class="btn-icon">＋</span> Nuova partita
@@ -573,13 +560,11 @@
       </div>
     </div>
 
-    <!-- FOOTER COPYRIGHT -->
     <div class="page-footer">
       &copy; Massimiliano Piazza
     </div>
   </div>
 
-  <!-- overlay risultati + coriandoli -->
   <div id="risultatiOverlay" class="risultati-overlay" style="display:none;">
     <div class="risultati-box">
       <div id="risultatiTesto" class="risultati-testo"></div>
@@ -691,6 +676,7 @@
 
           select.addEventListener('change', () => {
             aggiornaTotali();
+            applicaVincoloRiga(tr);
             controllaFinePartita();
           });
 
@@ -720,7 +706,38 @@
       tabellaContainer.appendChild(table);
 
       risultatiBtn.style.display = 'none';
+
+      // inizializza vincoli per tutte le righe
+      const rows = tbody.querySelectorAll('tr');
+      rows.forEach(applicaVincoloRiga);
+
       aggiornaTotali();
+    }
+
+    // in ogni riga, ogni punteggio >0 può essere usato da un solo giocatore
+    function applicaVincoloRiga(tr) {
+      const selects = tr.querySelectorAll('select.score-select');
+      if (!selects.length) return;
+
+      const usati = new Set();
+      selects.forEach(sel => {
+        const v = parseInt(sel.value || '0', 10);
+        if (v > 0) usati.add(v.toString());
+      });
+
+      selects.forEach(sel => {
+        const current = sel.value;
+        const options = sel.querySelectorAll('option');
+        options.forEach(opt => {
+          if (opt.value === '0') {
+            opt.disabled = false;
+          } else if (opt.value === current) {
+            opt.disabled = false;
+          } else {
+            opt.disabled = usati.has(opt.value);
+          }
+        });
+      });
     }
 
     function aggiornaTotali() {
@@ -739,7 +756,6 @@
       }
     }
 
-    // mostra "Risultati" solo se TUTTI i select hanno valore > 0
     function controllaFinePartita() {
       const selects = tabellaContainer.querySelectorAll('select.score-select');
       if (!selects.length) return;
