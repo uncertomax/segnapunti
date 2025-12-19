@@ -22,6 +22,10 @@
       --control-border: #c9a57d;
       --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.55);
       --wood-border: #4b2b16;
+      --btn-add: #e2f2ff;
+      --btn-add-border: #6d9fd6;
+      --btn-remove: #ffe7e2;
+      --btn-remove-border: #d6866d;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -41,6 +45,10 @@
         --control-border: #9d6b3f;
         --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.9);
         --wood-border: #2a180d;
+        --btn-add: #25405c;
+        --btn-add-border: #8ab4ff;
+        --btn-remove: #4e2620;
+        --btn-remove-border: #ffb4a9;
       }
     }
 
@@ -294,17 +302,17 @@
     }
 
     #tabellaContainer {
-      overflow-x: auto;
       border-radius: 14px;
       border: 1px solid rgba(0,0,0,0.2);
       background: var(--bg-card-inner);
       min-height: 0;
+      overflow-x: hidden;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 420px;
+      min-width: 360px;
     }
 
     th, td {
@@ -361,10 +369,36 @@
 
     #controls {
       display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      gap: 6px;
       margin-top: 8px;
+    }
+
+    .controls-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: nowrap;
+    }
+
+    .controls-row button {
+      flex: 1 1 0;
+      justify-content: center;
+    }
+
+    .btn-add {
+      background: var(--btn-add);
+      border-color: var(--btn-add-border);
+    }
+    .btn-add:hover {
+      background: var(--accent-soft);
+    }
+
+    .btn-remove {
+      background: var(--btn-remove);
+      border-color: var(--btn-remove-border);
+    }
+    .btn-remove:hover {
+      background: #ffd1c5;
     }
 
     .page-footer {
@@ -535,6 +569,9 @@
       .history-table {
         font-size: 10px;
       }
+      .controls-row {
+        flex-direction: row;
+      }
     }
   </style>
 </head>
@@ -602,21 +639,35 @@
           <div id="tabellaContainer"></div>
 
           <div id="controls" style="display:none;">
-            <button id="aggiungiPartitaBtn" class="ghost-btn" type="button">
-              <span class="btn-icon">＋</span> Aggiungi partita
-            </button>
-            <button id="rimuoviPartitaBtn" class="ghost-btn" type="button">
-              <span class="btn-icon">−</span> Rimuovi ultima partita
-            </button>
-            <button id="nuovaPartitaBtn" class="ghost-btn" type="button">
-              <span class="btn-icon">◎</span> Nuovo set
-            </button>
-            <button id="resetBtn" class="danger-btn" type="button">
-              <span class="btn-icon">↺</span> Reset completo
-            </button>
-            <button id="risultatiBtn" class="primary-btn" type="button" style="display:none;">
-              <span class="btn-icon">★</span> Risultati &amp; salva
-            </button>
+            <div class="controls-row">
+              <button id="partitaPrevBtn" class="ghost-btn" type="button">
+                ◀ Partita precedente
+              </button>
+              <button id="partitaNextBtn" class="ghost-btn" type="button">
+                Partita successiva ▶
+              </button>
+            </div>
+            <div class="controls-row">
+              <button id="aggiungiPartitaBtn" class="btn-add" type="button">
+                ＋ Aggiungi partita
+              </button>
+              <button id="rimuoviPartitaBtn" class="btn-remove" type="button">
+                − Rimuovi ultima partita
+              </button>
+            </div>
+            <div class="controls-row">
+              <button id="nuovaPartitaBtn" class="ghost-btn" type="button">
+                ◎ Nuovo set
+              </button>
+              <button id="resetBtn" class="danger-btn" type="button">
+                ↺ Reset completo
+              </button>
+            </div>
+            <div class="controls-row">
+              <button id="risultatiBtn" class="primary-btn" type="button" style="display:none;">
+                ★ Risultati &amp; salva
+              </button>
+            </div>
           </div>
 
           <!-- STORICO -->
@@ -669,7 +720,6 @@
   <div id="confetti-container"></div>
 
   <script>
-    // ---- RIFERIMENTI DOM ----
     const numPartecipantiInput = document.getElementById('numPartecipanti');
     const numPartiteInput = document.getElementById('numPartite');
     const generaNomiBtn = document.getElementById('generaNomi');
@@ -687,6 +737,8 @@
     const risultatiTesto = document.getElementById('risultatiTesto');
     const chiudiRisultatiBtn = document.getElementById('chiudiRisultatiBtn');
     const confettiContainer = document.getElementById('confetti-container');
+    const partitaPrevBtn = document.getElementById('partitaPrevBtn');
+    const partitaNextBtn = document.getElementById('partitaNextBtn');
 
     const historyEmptyEl = document.getElementById('historyEmpty');
     const historyTableEl = document.getElementById('historyTable');
@@ -697,16 +749,18 @@
     const historyFilterSelect = document.getElementById('historyFilter');
 
     const HISTORY_KEY = 'segnapuntiStorico';
+    const NAMES_KEY = 'segnapuntiNomi';
 
     let nomiCorrenti = [];
     let numPartecipantiCorrente = 0;
-    let numPartiteCorrenti = 0; // numero colonne/partite
+    let numPartiteCorrenti = 0;
     let totaliCorrenti = [];
+    let partitaCorrente = 0;
 
-    // ---- GENERAZIONE NOMI ----
     generaNomiBtn.addEventListener('click', () => {
       const n = parseInt(numPartecipantiInput.value, 10);
       nomiContainer.innerHTML = '';
+      const salvati = caricaNomiSalvati();
       for (let i = 0; i < n; i++) {
         const div = document.createElement('div');
         div.className = 'nome-input';
@@ -716,13 +770,13 @@
         input.type = 'text';
         input.id = 'nome_' + i;
         input.placeholder = 'Partecipante ' + (i + 1);
+        if (salvati[i]) input.value = salvati[i];
         div.appendChild(label);
         div.appendChild(input);
         nomiContainer.appendChild(div);
       }
     });
 
-    // ---- GENERA TABELLA (righe=giocatori, colonne=partite) ----
     generaTabellaBtn.addEventListener('click', () => {
       const nPartecipanti = parseInt(numPartecipantiInput.value, 10);
       const nPartite = parseInt(numPartiteInput.value, 10);
@@ -737,10 +791,13 @@
       nomiCorrenti = nomi;
       numPartecipantiCorrente = nPartecipanti;
       numPartiteCorrenti = nPartite;
+      partitaCorrente = 0;
 
+      salvaNomi(nomiCorrenti);
       generaTabella();
       setupContainer.style.display = 'none';
       controlsDiv.style.display = 'flex';
+      aggiornaNavigazionePartite();
     });
 
     function generaTabella() {
@@ -750,7 +807,6 @@
       const thead = document.createElement('thead');
       const tbody = document.createElement('tbody');
 
-      // Header
       const hr = document.createElement('tr');
       const thGioc = document.createElement('th');
       thGioc.textContent = 'Giocatore';
@@ -759,6 +815,7 @@
       for (let p = 0; p < numPartiteCorrenti; p++) {
         const th = document.createElement('th');
         th.textContent = 'Partita ' + (p + 1);
+        th.dataset.partitaIndex = p;
         hr.appendChild(th);
       }
 
@@ -767,7 +824,6 @@
       hr.appendChild(thTot);
       thead.appendChild(hr);
 
-      // Righe giocatori
       nomiCorrenti.forEach((nome, r) => {
         const tr = document.createElement('tr');
 
@@ -777,6 +833,7 @@
 
         for (let p = 0; p < numPartiteCorrenti; p++) {
           const td = document.createElement('td');
+          td.dataset.partitaIndex = p;
           const sel = document.createElement('select');
           sel.className = `score-select row-${r} partita-${p}`;
 
@@ -809,17 +866,17 @@
       table.appendChild(tbody);
       tabellaContainer.appendChild(table);
 
-      // vincoli e totali iniziali
       for (let p = 0; p < numPartiteCorrenti; p++) {
         applicaVincoloColonna(p);
       }
       for (let r = 0; r < numPartecipantiCorrente; r++) {
         aggiornaTotaleRiga(r);
       }
+
       controllaFinePartita();
+      aggiornaVisibilitaColonne();
     }
 
-    // ---- VINCOLO: un solo punteggio >0 per partita (colonna) ----
     function applicaVincoloColonna(partitaIndex) {
       const selects = document.querySelectorAll(`select.partita-${partitaIndex}`);
       if (!selects.length) return;
@@ -845,7 +902,6 @@
       });
     }
 
-    // ---- TOTALE PER GIOCATORE (riga) ----
     function aggiornaTotaleRiga(riga) {
       const selects = document.querySelectorAll(`select.row-${riga}`);
       let sum = 0;
@@ -862,7 +918,6 @@
       }
     }
 
-    // ---- CONTROLLA FINE PARTITA ----
     function controllaFinePartita() {
       const selects = tabellaContainer.querySelectorAll('select.score-select');
       if (!selects.length) return;
@@ -875,7 +930,50 @@
       risultatiBtn.style.display = allNonZero ? 'inline-flex' : 'none';
     }
 
-    // ---- AGGIUNGI / RIMUOVI PARTITE (COLONNE) ----
+    // navigazione partite (una visibile)
+    function aggiornaVisibilitaColonne() {
+      const table = tabellaContainer.querySelector('table');
+      if (!table) return;
+      const theadRow = table.querySelector('thead tr');
+      const headers = theadRow.querySelectorAll('th[data-partita-index]');
+      const bodyRows = table.querySelectorAll('tbody tr');
+
+      headers.forEach(th => {
+        const idx = parseInt(th.dataset.partitaIndex, 10);
+        th.style.display = (idx === partitaCorrente) ? '' : 'none';
+      });
+
+      bodyRows.forEach(tr => {
+        const cells = tr.querySelectorAll('td[data-partita-index]');
+        cells.forEach(td => {
+          const idx = parseInt(td.dataset.partitaIndex, 10);
+          td.style.display = (idx === partitaCorrente) ? '' : 'none';
+        });
+      });
+
+      aggiornaNavigazionePartite();
+    }
+
+    function aggiornaNavigazionePartite() {
+      partitaPrevBtn.disabled = (partitaCorrente <= 0);
+      partitaNextBtn.disabled = (partitaCorrente >= numPartiteCorrenti - 1);
+    }
+
+    partitaPrevBtn.addEventListener('click', () => {
+      if (partitaCorrente > 0) {
+        partitaCorrente--;
+        aggiornaVisibilitaColonne();
+      }
+    });
+
+    partitaNextBtn.addEventListener('click', () => {
+      if (partitaCorrente < numPartiteCorrenti - 1) {
+        partitaCorrente++;
+        aggiornaVisibilitaColonne();
+      }
+    });
+
+    // aggiungi/rimuovi partite
     aggiungiPartitaBtn.addEventListener('click', () => {
       if (!tabellaContainer.querySelector('table')) return;
       if (numPartiteCorrenti >= 50) {
@@ -884,7 +982,9 @@
       }
       numPartiteCorrenti += 1;
       aggiungiColonnaPartita(numPartiteCorrenti - 1);
+      partitaCorrente = numPartiteCorrenti - 1;
       controllaFinePartita();
+      aggiornaVisibilitaColonne();
     });
 
     function aggiungiColonnaPartita(index) {
@@ -893,16 +993,16 @@
       const theadRow = table.querySelector('thead tr');
       const tbody = table.querySelector('tbody');
 
-      // aggiungi header prima della colonna Totale (ultima)
       const thTot = theadRow.lastElementChild;
       const th = document.createElement('th');
       th.textContent = 'Partita ' + (index + 1);
+      th.dataset.partitaIndex = index;
       theadRow.insertBefore(th, thTot);
 
-      // per ogni riga giocatore aggiungi select prima del totale
       Array.from(tbody.rows).forEach((tr, r) => {
         const tdTot = tr.lastElementChild;
         const td = document.createElement('td');
+        td.dataset.partitaIndex = index;
         const sel = document.createElement('select');
         sel.className = `score-select row-${r} partita-${index}`;
         for (let v = 0; v <= 8; v++) {
@@ -937,8 +1037,12 @@
       }
       rimuoviColonnaPartita(lastIndex);
       numPartiteCorrenti -= 1;
+      if (partitaCorrente >= numPartiteCorrenti) {
+        partitaCorrente = numPartiteCorrenti - 1;
+      }
       aggiornaTuttiITotali();
       controllaFinePartita();
+      aggiornaVisibilitaColonne();
     });
 
     function colonnaVuota(index) {
@@ -953,25 +1057,32 @@
       const theadRow = table.querySelector('thead tr');
       const tbody = table.querySelector('tbody');
 
-      // rimuovi header (colonna # index+1: Giocatore è 0)
-      const thToRemove = theadRow.children[index + 1];
-      if (thToRemove) theadRow.removeChild(thToRemove);
+      const headers = theadRow.querySelectorAll('th[data-partita-index]');
+      headers.forEach(th => {
+        if (parseInt(th.dataset.partitaIndex, 10) === index) {
+          theadRow.removeChild(th);
+        }
+      });
 
-      // rimuovi cella in ogni riga
       Array.from(tbody.rows).forEach(tr => {
-        const tdToRemove = tr.children[index + 1];
-        if (tdToRemove) tr.removeChild(tdToRemove);
+        const cells = tr.querySelectorAll('td[data-partita-index]');
+        cells.forEach(td => {
+          if (parseInt(td.dataset.partitaIndex, 10) === index) {
+            tr.removeChild(td);
+          }
+        });
       });
     }
 
-    // ---- NUOVO SET E RESET ----
     nuovaPartitaBtn.addEventListener('click', () => {
       if (!nomiCorrenti.length) return;
       const nuovoNumero = prompt('Numero totale di partite per il nuovo set? (1-10)');
       const nPartite = parseInt(nuovoNumero, 10);
       if (!nPartite || nPartite < 1 || nPartite > 50) return;
       numPartiteCorrenti = nPartite;
+      partitaCorrente = 0;
       generaTabella();
+      aggiornaNavigazionePartite();
     });
 
     resetBtn.addEventListener('click', () => {
@@ -979,6 +1090,7 @@
       numPartecipantiCorrente = 0;
       numPartiteCorrenti = 0;
       totaliCorrenti = [];
+      partitaCorrente = 0;
       tabellaContainer.innerHTML = '';
       nomiContainer.innerHTML = '';
       numPartecipantiInput.value = '2';
@@ -990,7 +1102,6 @@
       if (confettiContainer) confettiContainer.innerHTML = '';
     });
 
-    // ---- RISULTATI + STORICO ----
     risultatiBtn.addEventListener('click', () => {
       if (!totaliCorrenti.length || !nomiCorrenti.length) return;
 
@@ -1027,7 +1138,6 @@
       }
     }
 
-    // ---- STORICO LOCALSTORAGE + EXPORT/IMPORT ----
     function caricaStorico() {
       try {
         const raw = localStorage.getItem(HISTORY_KEY);
@@ -1119,7 +1229,7 @@
 
       aggiornaFiltroGiocatori(storico);
 
-      let records = storico.slice().reverse(); // più recenti in alto
+      let records = storico.slice().reverse();
       if (filtro) {
         records = records.filter(rec =>
           (rec.giocatori || []).includes(filtro)
@@ -1195,7 +1305,27 @@
       importHistoryInput.value = '';
     });
 
-    // ---- TEMA ----
+    // salvataggio nomi
+    function salvaNomi(nomi) {
+      try {
+        localStorage.setItem(NAMES_KEY, JSON.stringify(nomi));
+      } catch (e) {
+        console.error('Errore salvataggio nomi', e);
+      }
+    }
+
+    function caricaNomiSalvati() {
+      try {
+        const raw = localStorage.getItem(NAMES_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    // tema
     const themeToggleBtn = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
     const themeLabel = document.getElementById('themeLabel');
@@ -1243,7 +1373,6 @@
       applyTheme(systemTheme, true);
     });
 
-    // init
     initTheme();
     renderStorico();
   </script>
