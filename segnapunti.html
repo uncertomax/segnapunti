@@ -309,7 +309,7 @@
 
     th, td {
       border-bottom: 1px solid rgba(0,0,0,0.12);
-      padding: 9px 10px;
+      padding: 8px 8px;
       text-align: center;
       font-size: 13px;
       white-space: nowrap;
@@ -339,18 +339,18 @@
     td:first-child,
     th:first-child {
       text-align: left;
-      padding-left: 14px;
+      padding-left: 10px;
       white-space: nowrap;
     }
 
     select.score-select {
-      padding: 5px 9px;
+      padding: 4px 6px;
       border-radius: 999px;
       border: 1px solid var(--control-border);
       background: var(--control-bg);
       font-size: 13px;
       color: var(--text);
-      min-width: 50px;
+      min-width: 46px;
       cursor: pointer;
     }
 
@@ -442,43 +442,99 @@
     body.dark-theme .ghost-btn:hover { background: #4a2e1d; }
     body.dark-theme .danger-btn:hover { background: #f17866; }
 
-    @media (max-width: 640px) {
-      body { padding: 10px; }
-      .page-title { font-size: 18px; }
-      .app-body { padding: 10px 10px 12px; }
-      table { min-width: 360px; }
+    /* STORICO */
+    .history-panel {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.04);
+      border: 1px solid rgba(0,0,0,0.12);
+      font-size: 12px;
     }
 
-    @media (min-width: 1024px) {
-      body { padding: 24px; }
-      .page-wrapper { max-width: 1300px; }
-      .page-title { font-size: 26px; }
-      .app-body { padding: 16px 20px 18px; gap: 16px; }
-      th, td { font-size: 14px; padding: 10px 12px; }
+    body.dark-theme .history-panel {
+      background: rgba(0,0,0,0.35);
+      border-color: rgba(255,255,255,0.08);
     }
 
-    @media (min-width: 1440px) {
-      body { padding: 32px; }
-      .page-wrapper { max-width: 1400px; }
-      .page-title { font-size: 30px; }
-      .app-body { padding: 20px 24px 22px; }
-      table { min-width: 600px; }
-      th, td { font-size: 15px; padding: 11px 14px; }
-      .field-group select,
-      .field-group input[type="text"] { font-size: 15px; }
-      .primary-btn,
-      .ghost-btn,
-      .danger-btn { font-size: 14px; padding-inline: 18px; }
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
     }
 
-    @media screen and (max-width: 768px) and (orientation: portrait) {
-      .app-shell { max-height: 100vh; }
-      .app-body { padding-bottom: 10px; }
+    .history-title {
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
     }
 
-    @media screen and (max-width: 900px) and (orientation: landscape) {
-      .app-body { flex-direction: column; }
-      .setup-row { flex-wrap: wrap; }
+    .history-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .history-actions button,
+    .history-actions label {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.25);
+      background: var(--bg-card-inner);
+      cursor: pointer;
+    }
+
+    body.dark-theme .history-actions button,
+    body.dark-theme .history-actions label {
+      background: #3a2415;
+      border-color: rgba(255,255,255,0.15);
+      color: var(--text);
+    }
+
+    #historyFilter {
+      font-size: 11px;
+      padding: 3px 6px;
+      border-radius: 999px;
+      border: 1px solid var(--control-border);
+      background: var(--control-bg);
+      max-width: 200px;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 4px;
+      font-size: 11px;
+    }
+
+    .history-table th,
+    .history-table td {
+      border: 1px solid rgba(0,0,0,0.15);
+      padding: 4px 6px;
+      text-align: left;
+    }
+
+    .history-table th {
+      background: rgba(0,0,0,0.06);
+    }
+
+    body.dark-theme .history-table th {
+      background: rgba(0,0,0,0.5);
+    }
+
+    @media (max-width: 480px) {
+      th, td {
+        font-size: 12px;
+      }
+      .history-table {
+        font-size: 10px;
+      }
     }
   </style>
 </head>
@@ -515,7 +571,7 @@
               </div>
 
               <div class="field-group">
-                <label for="numPartite">Numero partite</label>
+                <label for="numPartite">Numero partite iniziali</label>
                 <select id="numPartite">
                   <option value="1">1</option>
                   <option value="2">2</option>
@@ -546,16 +602,54 @@
           <div id="tabellaContainer"></div>
 
           <div id="controls" style="display:none;">
+            <button id="aggiungiPartitaBtn" class="ghost-btn" type="button">
+              <span class="btn-icon">＋</span> Aggiungi partita
+            </button>
+            <button id="rimuoviPartitaBtn" class="ghost-btn" type="button">
+              <span class="btn-icon">−</span> Rimuovi ultima partita
+            </button>
             <button id="nuovaPartitaBtn" class="ghost-btn" type="button">
-              <span class="btn-icon">＋</span> Nuova partita
+              <span class="btn-icon">◎</span> Nuovo set
             </button>
             <button id="resetBtn" class="danger-btn" type="button">
               <span class="btn-icon">↺</span> Reset completo
             </button>
             <button id="risultatiBtn" class="primary-btn" type="button" style="display:none;">
-              <span class="btn-icon">★</span> Risultati
+              <span class="btn-icon">★</span> Risultati &amp; salva
             </button>
           </div>
+
+          <!-- STORICO -->
+          <section class="history-panel">
+            <div class="history-header">
+              <div class="history-title">Storico partite (locale)</div>
+              <div class="history-actions">
+                <select id="historyFilter">
+                  <option value="">Tutti i giocatori</option>
+                </select>
+                <button id="exportHistoryBtn" type="button">Esporta</button>
+                <label>
+                  Importa
+                  <input id="importHistoryInput" type="file" accept="application/json" style="display:none;">
+                </label>
+                <button id="clearHistoryBtn" type="button">Svuota storico</button>
+              </div>
+            </div>
+            <div id="historyEmpty" style="font-size:11px;color:var(--text-muted);">
+              Nessuna partita salvata.
+            </div>
+            <table id="historyTable" class="history-table" style="display:none;">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Vincitore</th>
+                  <th>Punti</th>
+                  <th>Giocatori</th>
+                </tr>
+              </thead>
+              <tbody id="historyTbody"></tbody>
+            </table>
+          </section>
         </main>
       </div>
     </div>
@@ -575,6 +669,7 @@
   <div id="confetti-container"></div>
 
   <script>
+    // ---- RIFERIMENTI DOM ----
     const numPartecipantiInput = document.getElementById('numPartecipanti');
     const numPartiteInput = document.getElementById('numPartite');
     const generaNomiBtn = document.getElementById('generaNomi');
@@ -583,6 +678,8 @@
     const tabellaContainer = document.getElementById('tabellaContainer');
     const setupContainer = document.getElementById('setupContainer');
     const controlsDiv = document.getElementById('controls');
+    const aggiungiPartitaBtn = document.getElementById('aggiungiPartitaBtn');
+    const rimuoviPartitaBtn = document.getElementById('rimuoviPartitaBtn');
     const nuovaPartitaBtn = document.getElementById('nuovaPartitaBtn');
     const resetBtn = document.getElementById('resetBtn');
     const risultatiBtn = document.getElementById('risultatiBtn');
@@ -591,10 +688,22 @@
     const chiudiRisultatiBtn = document.getElementById('chiudiRisultatiBtn');
     const confettiContainer = document.getElementById('confetti-container');
 
+    const historyEmptyEl = document.getElementById('historyEmpty');
+    const historyTableEl = document.getElementById('historyTable');
+    const historyTbodyEl = document.getElementById('historyTbody');
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    const exportHistoryBtn = document.getElementById('exportHistoryBtn');
+    const importHistoryInput = document.getElementById('importHistoryInput');
+    const historyFilterSelect = document.getElementById('historyFilter');
+
+    const HISTORY_KEY = 'segnapuntiStorico';
+
     let nomiCorrenti = [];
     let numPartecipantiCorrente = 0;
+    let numPartiteCorrenti = 0; // numero colonne/partite
     let totaliCorrenti = [];
 
+    // ---- GENERAZIONE NOMI ----
     generaNomiBtn.addEventListener('click', () => {
       const n = parseInt(numPartecipantiInput.value, 10);
       nomiContainer.innerHTML = '';
@@ -613,6 +722,7 @@
       }
     });
 
+    // ---- GENERA TABELLA (righe=giocatori, colonne=partite) ----
     generaTabellaBtn.addEventListener('click', () => {
       const nPartecipanti = parseInt(numPartecipantiInput.value, 10);
       const nPartite = parseInt(numPartiteInput.value, 10);
@@ -626,97 +736,92 @@
 
       nomiCorrenti = nomi;
       numPartecipantiCorrente = nPartecipanti;
+      numPartiteCorrenti = nPartite;
 
-      generaTabella(nomiCorrenti, nPartite);
-
+      generaTabella();
       setupContainer.style.display = 'none';
       controlsDiv.style.display = 'flex';
     });
 
-    function generaTabella(nomi, nPartite) {
+    function generaTabella() {
       tabellaContainer.innerHTML = '';
-
-      const nPartecipanti = nomi.length;
 
       const table = document.createElement('table');
       const thead = document.createElement('thead');
       const tbody = document.createElement('tbody');
-      const tfoot = document.createElement('tfoot');
 
-      const headerRow = document.createElement('tr');
-      const thVuoto = document.createElement('th');
-      thVuoto.textContent = 'Partita';
-      headerRow.appendChild(thVuoto);
+      // Header
+      const hr = document.createElement('tr');
+      const thGioc = document.createElement('th');
+      thGioc.textContent = 'Giocatore';
+      hr.appendChild(thGioc);
 
-      nomi.forEach(nome => {
+      for (let p = 0; p < numPartiteCorrenti; p++) {
         const th = document.createElement('th');
-        th.textContent = nome;
-        headerRow.appendChild(th);
-      });
-      thead.appendChild(headerRow);
+        th.textContent = 'Partita ' + (p + 1);
+        hr.appendChild(th);
+      }
 
-      for (let r = 0; r < nPartite; r++) {
+      const thTot = document.createElement('th');
+      thTot.textContent = 'Totale';
+      hr.appendChild(thTot);
+      thead.appendChild(hr);
+
+      // Righe giocatori
+      nomiCorrenti.forEach((nome, r) => {
         const tr = document.createElement('tr');
 
-        const tdLabel = document.createElement('td');
-        tdLabel.textContent = 'Partita ' + (r + 1);
-        tr.appendChild(tdLabel);
+        const tdNome = document.createElement('td');
+        tdNome.textContent = nome;
+        tr.appendChild(tdNome);
 
-        for (let c = 0; c < nPartecipanti; c++) {
+        for (let p = 0; p < numPartiteCorrenti; p++) {
           const td = document.createElement('td');
-          const select = document.createElement('select');
-          select.className = 'score-select col-' + c;
+          const sel = document.createElement('select');
+          sel.className = `score-select row-${r} partita-${p}`;
 
-          for (let val = 0; val <= 8; val++) {
+          for (let v = 0; v <= 8; v++) {
             const opt = document.createElement('option');
-            opt.value = val;
-            opt.textContent = val;
-            select.appendChild(opt);
+            opt.value = v;
+            opt.textContent = v;
+            sel.appendChild(opt);
           }
 
-          select.addEventListener('change', () => {
-            aggiornaTotali();
-            applicaVincoloRiga(tr);
+          sel.addEventListener('change', () => {
+            aggiornaTotaleRiga(r);
+            applicaVincoloColonna(p);
             controllaFinePartita();
           });
 
-          td.appendChild(select);
+          td.appendChild(sel);
           tr.appendChild(td);
         }
 
+        const tdTot = document.createElement('td');
+        tdTot.id = 'totale_row_' + r;
+        tdTot.textContent = '0';
+        tr.appendChild(tdTot);
+
         tbody.appendChild(tr);
-      }
-
-      const trTotale = document.createElement('tr');
-      const tdLabelTot = document.createElement('td');
-      tdLabelTot.textContent = 'Totale';
-      trTotale.appendChild(tdLabelTot);
-
-      for (let c = 0; c < nPartecipanti; c++) {
-        const td = document.createElement('td');
-        td.id = 'totale_col_' + c;
-        td.textContent = '0';
-        trTotale.appendChild(td);
-      }
-      tfoot.appendChild(trTotale);
+      });
 
       table.appendChild(thead);
       table.appendChild(tbody);
-      table.appendChild(tfoot);
       tabellaContainer.appendChild(table);
 
-      risultatiBtn.style.display = 'none';
-
-      // inizializza vincoli per tutte le righe
-      const rows = tbody.querySelectorAll('tr');
-      rows.forEach(applicaVincoloRiga);
-
-      aggiornaTotali();
+      // vincoli e totali iniziali
+      for (let p = 0; p < numPartiteCorrenti; p++) {
+        applicaVincoloColonna(p);
+      }
+      for (let r = 0; r < numPartecipantiCorrente; r++) {
+        aggiornaTotaleRiga(r);
+      }
+      controllaFinePartita();
     }
 
-    // in ogni riga, ogni punteggio >0 può essere usato da un solo giocatore
-    function applicaVincoloRiga(tr) {
-      const selects = tr.querySelectorAll('select.score-select');
+    // ---- VINCOLO: un solo punteggio >0 per partita (colonna) ----
+    function applicaVincoloColonna(partitaIndex) {
+      const selects = document.querySelectorAll(`select.partita-${partitaIndex}`);
       if (!selects.length) return;
 
       const usati = new Set();
@@ -740,22 +845,24 @@
       });
     }
 
-    function aggiornaTotali() {
-      const nPartecipanti = numPartecipantiCorrente || parseInt(numPartecipantiInput.value, 10) || 0;
+    // ---- TOTALE PER GIOCATORE (riga) ----
+    function aggiornaTotaleRiga(riga) {
+      const selects = document.querySelectorAll(`select.row-${riga}`);
+      let sum = 0;
+      selects.forEach(sel => sum += parseInt(sel.value || '0', 10));
+      totaliCorrenti[riga] = sum;
+      const tdTot = document.getElementById('totale_row_' + riga);
+      if (tdTot) tdTot.textContent = sum;
+    }
 
+    function aggiornaTuttiITotali() {
       totaliCorrenti = [];
-      for (let c = 0; c < nPartecipanti; c++) {
-        const selects = document.querySelectorAll('select.col-' + c);
-        let sum = 0;
-        selects.forEach(sel => {
-          sum += parseInt(sel.value || '0', 10);
-        });
-        totaliCorrenti[c] = sum;
-        const tdTot = document.getElementById('totale_col_' + c);
-        if (tdTot) tdTot.textContent = sum;
+      for (let r = 0; r < numPartecipantiCorrente; r++) {
+        aggiornaTotaleRiga(r);
       }
     }
 
+    // ---- CONTROLLA FINE PARTITA ----
     function controllaFinePartita() {
       const selects = tabellaContainer.querySelectorAll('select.score-select');
       if (!selects.length) return;
@@ -768,17 +875,109 @@
       risultatiBtn.style.display = allNonZero ? 'inline-flex' : 'none';
     }
 
+    // ---- AGGIUNGI / RIMUOVI PARTITE (COLONNE) ----
+    aggiungiPartitaBtn.addEventListener('click', () => {
+      if (!tabellaContainer.querySelector('table')) return;
+      if (numPartiteCorrenti >= 50) {
+        alert('Limite massimo 50 partite per set.');
+        return;
+      }
+      numPartiteCorrenti += 1;
+      aggiungiColonnaPartita(numPartiteCorrenti - 1);
+      controllaFinePartita();
+    });
+
+    function aggiungiColonnaPartita(index) {
+      const table = tabellaContainer.querySelector('table');
+      if (!table) return;
+      const theadRow = table.querySelector('thead tr');
+      const tbody = table.querySelector('tbody');
+
+      // aggiungi header prima della colonna Totale (ultima)
+      const thTot = theadRow.lastElementChild;
+      const th = document.createElement('th');
+      th.textContent = 'Partita ' + (index + 1);
+      theadRow.insertBefore(th, thTot);
+
+      // per ogni riga giocatore aggiungi select prima del totale
+      Array.from(tbody.rows).forEach((tr, r) => {
+        const tdTot = tr.lastElementChild;
+        const td = document.createElement('td');
+        const sel = document.createElement('select');
+        sel.className = `score-select row-${r} partita-${index}`;
+        for (let v = 0; v <= 8; v++) {
+          const opt = document.createElement('option');
+          opt.value = v;
+          opt.textContent = v;
+          sel.appendChild(opt);
+        }
+        sel.addEventListener('change', () => {
+          aggiornaTotaleRiga(r);
+          applicaVincoloColonna(index);
+          controllaFinePartita();
+        });
+        td.appendChild(sel);
+        tr.insertBefore(td, tdTot);
+      });
+
+      applicaVincoloColonna(index);
+      aggiornaTuttiITotali();
+    }
+
+    rimuoviPartitaBtn.addEventListener('click', () => {
+      if (!tabellaContainer.querySelector('table')) return;
+      if (numPartiteCorrenti <= 1) {
+        alert('Deve rimanere almeno una partita.');
+        return;
+      }
+      const lastIndex = numPartiteCorrenti - 1;
+      if (!colonnaVuota(lastIndex)) {
+        alert('Puoi rimuovere solo l’ultima partita se tutti i punteggi sono 0.');
+        return;
+      }
+      rimuoviColonnaPartita(lastIndex);
+      numPartiteCorrenti -= 1;
+      aggiornaTuttiITotali();
+      controllaFinePartita();
+    });
+
+    function colonnaVuota(index) {
+      const selects = document.querySelectorAll(`select.partita-${index}`);
+      if (!selects.length) return true;
+      return Array.from(selects).every(sel => parseInt(sel.value || '0', 10) === 0);
+    }
+
+    function rimuoviColonnaPartita(index) {
+      const table = tabellaContainer.querySelector('table');
+      if (!table) return;
+      const theadRow = table.querySelector('thead tr');
+      const tbody = table.querySelector('tbody');
+
+      // rimuovi header (colonna # index+1: Giocatore è 0)
+      const thToRemove = theadRow.children[index + 1];
+      if (thToRemove) theadRow.removeChild(thToRemove);
+
+      // rimuovi cella in ogni riga
+      Array.from(tbody.rows).forEach(tr => {
+        const tdToRemove = tr.children[index + 1];
+        if (tdToRemove) tr.removeChild(tdToRemove);
+      });
+    }
+
+    // ---- NUOVO SET E RESET ----
     nuovaPartitaBtn.addEventListener('click', () => {
       if (!nomiCorrenti.length) return;
-      const nuovoNumero = prompt('Quante partite vuoi giocare? (1-10)');
+      const nuovoNumero = prompt('Numero totale di partite per il nuovo set? (1-10)');
       const nPartite = parseInt(nuovoNumero, 10);
-      if (!nPartite || nPartite < 1 || nPartite > 10) return;
-      generaTabella(nomiCorrenti, nPartite);
+      if (!nPartite || nPartite < 1 || nPartite > 50) return;
+      numPartiteCorrenti = nPartite;
+      generaTabella();
     });
 
     resetBtn.addEventListener('click', () => {
       nomiCorrenti = [];
       numPartecipantiCorrente = 0;
+      numPartiteCorrenti = 0;
       totaliCorrenti = [];
       tabellaContainer.innerHTML = '';
       nomiContainer.innerHTML = '';
@@ -791,18 +990,21 @@
       if (confettiContainer) confettiContainer.innerHTML = '';
     });
 
+    // ---- RISULTATI + STORICO ----
     risultatiBtn.addEventListener('click', () => {
-  if (!totaliCorrenti.length || !nomiCorrenti.length) return;
+      if (!totaliCorrenti.length || !nomiCorrenti.length) return;
 
-  const min = Math.min(...totaliCorrenti);
-  const winnerIndex = totaliCorrenti.indexOf(min);
-  const winnerName = nomiCorrenti[winnerIndex] || ('Partecipante ' + (winnerIndex + 1));
+      const min = Math.min(...totaliCorrenti);
+      const winnerIndex = totaliCorrenti.indexOf(min);
+      const winnerName = nomiCorrenti[winnerIndex] || ('Partecipante ' + (winnerIndex + 1));
 
-  risultatiTesto.textContent = `Vincitore: ${winnerName} con ${min} punti`;
-  risultatiOverlay.style.display = 'flex';
-  lanciaConfetti();
-});
+      risultatiTesto.textContent = `Vincitore: ${winnerName} con ${min} punti`;
+      risultatiOverlay.style.display = 'flex';
+      lanciaConfetti();
 
+      salvaRisultatoStorico(winnerName, min);
+      renderStorico();
+    });
 
     chiudiRisultatiBtn.addEventListener('click', () => {
       risultatiOverlay.style.display = 'none';
@@ -825,6 +1027,175 @@
       }
     }
 
+    // ---- STORICO LOCALSTORAGE + EXPORT/IMPORT ----
+    function caricaStorico() {
+      try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        console.error('Errore lettura storico', e);
+        return [];
+      }
+    }
+
+    function salvaStorico(arr) {
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
+      } catch (e) {
+        console.error('Errore salvataggio storico', e);
+      }
+    }
+
+    function salvaRisultatoStorico(nomeVincitore, punteggio) {
+      const storico = caricaStorico();
+      const now = new Date();
+      const record = {
+        vincitore: nomeVincitore,
+        punteggio,
+        giocatori: nomiCorrenti.slice(),
+        dataISO: now.toISOString()
+      };
+      storico.push(record);
+      const trimmed = storico.slice(-200);
+      salvaStorico(trimmed);
+    }
+
+    function formattaDataBreve(iso) {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return '';
+      return d.toLocaleString('it-IT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function aggiornaFiltroGiocatori(storico) {
+      const tutti = new Set();
+      storico.forEach(rec => {
+        (rec.giocatori || []).forEach(n => {
+          if (n && typeof n === 'string') tutti.add(n);
+        });
+      });
+
+      const selected = historyFilterSelect.value;
+      historyFilterSelect.innerHTML = '';
+      const optAll = document.createElement('option');
+      optAll.value = '';
+      optAll.textContent = 'Tutti i giocatori';
+      historyFilterSelect.appendChild(optAll);
+
+      Array.from(tutti).sort().forEach(nome => {
+        const opt = document.createElement('option');
+        opt.value = nome;
+        opt.textContent = nome;
+        historyFilterSelect.appendChild(opt);
+      });
+
+      if (selected && Array.from(tutti).includes(selected)) {
+        historyFilterSelect.value = selected;
+      } else {
+        historyFilterSelect.value = '';
+      }
+    }
+
+    function renderStorico() {
+      const storico = caricaStorico();
+      const filtro = historyFilterSelect.value || '';
+
+      if (!storico.length) {
+        historyEmptyEl.style.display = 'block';
+        historyTableEl.style.display = 'none';
+        aggiornaFiltroGiocatori(storico);
+        return;
+      }
+
+      historyEmptyEl.style.display = 'none';
+      historyTableEl.style.display = 'table';
+
+      aggiornaFiltroGiocatori(storico);
+
+      let records = storico.slice().reverse(); // più recenti in alto
+      if (filtro) {
+        records = records.filter(rec =>
+          (rec.giocatori || []).includes(filtro)
+        );
+      }
+
+      historyTbodyEl.innerHTML = '';
+      records.forEach(rec => {
+        const tr = document.createElement('tr');
+
+        const tdData = document.createElement('td');
+        tdData.textContent = formattaDataBreve(rec.dataISO);
+        tr.appendChild(tdData);
+
+        const tdVinc = document.createElement('td');
+        tdVinc.textContent = rec.vincitore || '';
+        tr.appendChild(tdVinc);
+
+        const tdPunti = document.createElement('td');
+        tdPunti.textContent = rec.punteggio != null ? rec.punteggio : '';
+        tr.appendChild(tdPunti);
+
+        const tdGioc = document.createElement('td');
+        tdGioc.textContent = (rec.giocatori || []).join(', ');
+        tr.appendChild(tdGioc);
+
+        historyTbodyEl.appendChild(tr);
+      });
+    }
+
+    clearHistoryBtn.addEventListener('click', () => {
+      if (!confirm('Sicuro di voler svuotare lo storico locale delle partite?')) return;
+      salvaStorico([]);
+      renderStorico();
+    });
+
+    historyFilterSelect.addEventListener('change', () => {
+      renderStorico();
+    });
+
+    exportHistoryBtn.addEventListener('click', () => {
+      const storico = caricaStorico();
+      const blob = new Blob([JSON.stringify(storico, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'segnapunti-storico.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    importHistoryInput.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (!Array.isArray(data)) {
+            alert('File non valido: ci si aspetta un array JSON.');
+            return;
+          }
+          salvaStorico(data);
+          renderStorico();
+        } catch (err) {
+          console.error(err);
+          alert('Errore durante la lettura del file JSON.');
+        }
+      };
+      reader.readAsText(file);
+      importHistoryInput.value = '';
+    });
+
+    // ---- TEMA ----
     const themeToggleBtn = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
     const themeLabel = document.getElementById('themeLabel');
@@ -872,7 +1243,9 @@
       applyTheme(systemTheme, true);
     });
 
+    // init
     initTheme();
+    renderStorico();
   </script>
 </body>
 </html>
