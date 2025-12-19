@@ -22,10 +22,10 @@
       --control-border: #c9a57d;
       --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.55);
       --wood-border: #4b2b16;
-      --btn-add: #e2f2ff;
-      --btn-add-border: #6d9fd6;
-      --btn-remove: #ffe7e2;
-      --btn-remove-border: #d6866d;
+      --btn-add: #e7c7a0;
+      --btn-add-border: #b4793e;
+      --btn-remove: #d9a26f;
+      --btn-remove-border: #8e5524;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -45,10 +45,10 @@
         --control-border: #9d6b3f;
         --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.9);
         --wood-border: #2a180d;
-        --btn-add: #25405c;
-        --btn-add-border: #8ab4ff;
-        --btn-remove: #4e2620;
-        --btn-remove-border: #ffb4a9;
+        --btn-add: #5a3a21;
+        --btn-add-border: #d9a26f;
+        --btn-remove: #4a2b18;
+        --btn-remove-border: #f0b47c;
       }
     }
 
@@ -115,8 +115,8 @@
       text-align: center;
       font-family: "Cinzel", "Poppins", system-ui, sans-serif;
       font-weight: 700;
-      letter-spacing: 0.18em;
-      font-size: 22px;
+      letter-spacing: 0.20em;
+      font-size: 28px;
       text-transform: uppercase;
       color: #f8e1a8;
     }
@@ -312,12 +312,13 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 360px;
+      min-width: 0;
+      table-layout: fixed;
     }
 
     th, td {
       border-bottom: 1px solid rgba(0,0,0,0.12);
-      padding: 8px 8px;
+      padding: 8px 6px;
       text-align: center;
       font-size: 13px;
       white-space: nowrap;
@@ -344,11 +345,21 @@
       color: #fbe7c4;
     }
 
-    td:first-child,
-    th:first-child {
+    th:nth-child(1),
+    td:nth-child(1) {
+      width: 45%;
       text-align: left;
       padding-left: 10px;
-      white-space: nowrap;
+    }
+
+    th:nth-child(2),
+    td:nth-child(2) {
+      width: 25%;
+    }
+
+    th:nth-child(3),
+    td:nth-child(3) {
+      width: 30%;
     }
 
     select.score-select {
@@ -385,20 +396,42 @@
       justify-content: center;
     }
 
+    .btn-add,
+    .btn-remove {
+      padding: 7px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s, transform 0.07s;
+      color: #2b1b11;
+    }
+
     .btn-add {
       background: var(--btn-add);
-      border-color: var(--btn-add-border);
-    }
-    .btn-add:hover {
-      background: var(--accent-soft);
+      border: 1px solid var(--btn-add-border);
     }
 
     .btn-remove {
       background: var(--btn-remove);
-      border-color: var(--btn-remove-border);
+      border: 1px solid var(--btn-remove-border);
     }
+
+    .btn-add:hover {
+      background: #f0d0a9;
+    }
+
     .btn-remove:hover {
-      background: #ffd1c5;
+      background: #e2b17d;
+    }
+
+    body.dark-theme .btn-add,
+    body.dark-theme .btn-remove {
+      color: #f8ecd7;
     }
 
     .page-footer {
@@ -476,7 +509,6 @@
     body.dark-theme .ghost-btn:hover { background: #4a2e1d; }
     body.dark-theme .danger-btn:hover { background: #f17866; }
 
-    /* STORICO */
     .history-panel {
       margin-top: 10px;
       padding: 10px 12px;
@@ -563,15 +595,8 @@
     }
 
     @media (max-width: 480px) {
-      th, td {
-        font-size: 12px;
-      }
-      .history-table {
-        font-size: 10px;
-      }
-      .controls-row {
-        flex-direction: row;
-      }
+      th, td { font-size: 12px; }
+      .history-table { font-size: 10px; }
     }
   </style>
 </head>
@@ -670,7 +695,6 @@
             </div>
           </div>
 
-          <!-- STORICO -->
           <section class="history-panel">
             <div class="history-header">
               <div class="history-title">Storico partite (locale)</div>
@@ -930,7 +954,6 @@
       risultatiBtn.style.display = allNonZero ? 'inline-flex' : 'none';
     }
 
-    // navigazione partite (una visibile)
     function aggiornaVisibilitaColonne() {
       const table = tabellaContainer.querySelector('table');
       if (!table) return;
@@ -973,7 +996,6 @@
       }
     });
 
-    // aggiungi/rimuovi partite
     aggiungiPartitaBtn.addEventListener('click', () => {
       if (!tabellaContainer.querySelector('table')) return;
       if (numPartiteCorrenti >= 50) {
@@ -1305,7 +1327,6 @@
       importHistoryInput.value = '';
     });
 
-    // salvataggio nomi
     function salvaNomi(nomi) {
       try {
         localStorage.setItem(NAMES_KEY, JSON.stringify(nomi));
@@ -1325,7 +1346,6 @@
       }
     }
 
-    // tema
     const themeToggleBtn = document.getElementById('themeToggle');
     const themeIcon = document.getElementById('themeIcon');
     const themeLabel = document.getElementById('themeLabel');
