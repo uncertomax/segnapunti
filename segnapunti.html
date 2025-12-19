@@ -347,19 +347,25 @@
 
     th:nth-child(1),
     td:nth-child(1) {
-      width: 45%;
+      width: 40%;
       text-align: left;
       padding-left: 10px;
     }
 
     th:nth-child(2),
     td:nth-child(2) {
-      width: 25%;
+      width: 28%;
     }
 
     th:nth-child(3),
     td:nth-child(3) {
-      width: 30%;
+      width: 32%;
+    }
+
+    td:nth-child(1) {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     select.score-select {
@@ -421,17 +427,23 @@
       border: 1px solid var(--btn-remove-border);
     }
 
-    .btn-add:hover {
-      background: #f0d0a9;
-    }
-
-    .btn-remove:hover {
-      background: #e2b17d;
-    }
+    .btn-add:hover { background: #f0d0a9; }
+    .btn-remove:hover { background: #e2b17d; }
 
     body.dark-theme .btn-add,
     body.dark-theme .btn-remove {
       color: #f8ecd7;
+    }
+
+    .partita-ready {
+      background: var(--accent-secondary) !important;
+      color: #1b1008 !important;
+      border-color: #1e6e65 !important;
+    }
+
+    body.dark-theme .partita-ready {
+      background: #39c4b8 !important;
+      color: #051513 !important;
     }
 
     .page-footer {
@@ -577,6 +589,7 @@
       border-collapse: collapse;
       margin-top: 4px;
       font-size: 11px;
+      table-layout: fixed;
     }
 
     .history-table th,
@@ -592,6 +605,26 @@
 
     body.dark-theme .history-table th {
       background: rgba(0,0,0,0.5);
+    }
+
+    .history-table th:nth-child(1),
+    .history-table td:nth-child(1) {
+      width: 22%;
+    }
+    .history-table th:nth-child(2),
+    .history-table td:nth-child(2) {
+      width: 20%;
+    }
+    .history-table th:nth-child(3),
+    .history-table td:nth-child(3) {
+      width: 12%;
+    }
+    .history-table th:nth-child(4),
+    .history-table td:nth-child(4) {
+      width: 46%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     @media (max-width: 480px) {
@@ -666,18 +699,18 @@
           <div id="controls" style="display:none;">
             <div class="controls-row">
               <button id="partitaPrevBtn" class="ghost-btn" type="button">
-                ◀ Partita precedente
+                ◀ Partita prec.
               </button>
               <button id="partitaNextBtn" class="ghost-btn" type="button">
-                Partita successiva ▶
+                Partita succ. ▶
               </button>
             </div>
             <div class="controls-row">
               <button id="aggiungiPartitaBtn" class="btn-add" type="button">
-                ＋ Aggiungi partita
+                ＋ Partita
               </button>
               <button id="rimuoviPartitaBtn" class="btn-remove" type="button">
-                − Rimuovi ultima partita
+                − Rimuovi partita
               </button>
             </div>
             <div class="controls-row">
@@ -699,7 +732,7 @@
             <div class="history-header">
               <div class="history-title">Storico partite (locale)</div>
               <div class="history-actions">
-                <select id="historyFilter">
+                <select id="historyFilter" multiple size="1">
                   <option value="">Tutti i giocatori</option>
                 </select>
                 <button id="exportHistoryBtn" type="button">Esporta</button>
@@ -945,6 +978,7 @@
     function controllaFinePartita() {
       const selects = tabellaContainer.querySelectorAll('select.score-select');
       if (!selects.length) return;
+
       let allNonZero = true;
       selects.forEach(sel => {
         if (parseInt(sel.value || '0', 10) === 0) {
@@ -952,6 +986,22 @@
         }
       });
       risultatiBtn.style.display = allNonZero ? 'inline-flex' : 'none';
+
+      // evidenzia "Partita successiva" se la colonna corrente è completa
+      if (numPartiteCorrenti > 0) {
+        const colSelects = document.querySelectorAll(`select.partita-${partitaCorrente}`);
+        let colCompleta = colSelects.length > 0;
+        colSelects.forEach(sel => {
+          if (parseInt(sel.value || '0', 10) === 0) {
+            colCompleta = false;
+          }
+        });
+        if (colCompleta && partitaCorrente < numPartiteCorrenti - 1) {
+          partitaNextBtn.classList.add('partita-ready');
+        } else {
+          partitaNextBtn.classList.remove('partita-ready');
+        }
+      }
     }
 
     function aggiornaVisibilitaColonne() {
@@ -975,6 +1025,7 @@
       });
 
       aggiornaNavigazionePartite();
+      controllaFinePartita();
     }
 
     function aggiornaNavigazionePartite() {
@@ -1121,6 +1172,7 @@
       controlsDiv.style.display = 'none';
       risultatiOverlay.style.display = 'none';
       risultatiBtn.style.display = 'none';
+      partitaNextBtn.classList.remove('partita-ready');
       if (confettiContainer) confettiContainer.innerHTML = '';
     });
 
@@ -1206,6 +1258,12 @@
       });
     }
 
+    function getFiltriGiocatori() {
+      return Array.from(historyFilterSelect.options)
+        .filter(o => o.selected && o.value !== '')
+        .map(o => o.value);
+    }
+
     function aggiornaFiltroGiocatori(storico) {
       const tutti = new Set();
       storico.forEach(rec => {
@@ -1214,7 +1272,12 @@
         });
       });
 
-      const selected = historyFilterSelect.value;
+      const selectedValues = new Set(
+        Array.from(historyFilterSelect.options)
+          .filter(o => o.selected && o.value !== '')
+          .map(o => o.value)
+      );
+
       historyFilterSelect.innerHTML = '';
       const optAll = document.createElement('option');
       optAll.value = '';
@@ -1225,19 +1288,14 @@
         const opt = document.createElement('option');
         opt.value = nome;
         opt.textContent = nome;
+        if (selectedValues.has(nome)) opt.selected = true;
         historyFilterSelect.appendChild(opt);
       });
-
-      if (selected && Array.from(tutti).includes(selected)) {
-        historyFilterSelect.value = selected;
-      } else {
-        historyFilterSelect.value = '';
-      }
     }
 
     function renderStorico() {
       const storico = caricaStorico();
-      const filtro = historyFilterSelect.value || '';
+      const filtri = getFiltriGiocatori();
 
       if (!storico.length) {
         historyEmptyEl.style.display = 'block';
@@ -1252,10 +1310,11 @@
       aggiornaFiltroGiocatori(storico);
 
       let records = storico.slice().reverse();
-      if (filtro) {
-        records = records.filter(rec =>
-          (rec.giocatori || []).includes(filtro)
-        );
+      if (filtri.length) {
+        records = records.filter(rec => {
+          const gioc = rec.giocatori || [];
+          return filtri.some(nome => gioc.includes(nome));
+        });
       }
 
       historyTbodyEl.innerHTML = '';
@@ -1341,7 +1400,7 @@
         if (!raw) return [];
         const parsed = JSON.parse(raw);
         return Array.isArray(parsed) ? parsed : [];
-      } catch (e) {
+      } catch {
         return [];
       }
     }
