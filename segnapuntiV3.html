@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Segnapunti</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #24160f;
+      --bg-card: #f2dfc0;
+      --bg-card-inner: #f7ebd3;
+      --text: #2b1b11;
+      --text-muted: #7a6350;
+      --accent: #f4a462;
+      --accent-strong: #e48835;
+      --accent-soft: #f4c58b;
+      --accent-secondary: #2a9d90;
+      --border: #7e4c3a;
+      --danger: #c0392b;
+      --control-bg: #f7ebd3;
+      --control-border: #c9a57d;
+      --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.55);
+      --wood-border: #4b2b16;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #120c08;
+        --bg-card: #322018;
+        --bg-card-inner: #24150f;
+        --text: #f6ebd6;
+        --text-muted: #e0c49b;
+        --accent: #f4a462;
+        --accent-strong: #ffb862;
+        --accent-soft: #7e4c3a;
+        --accent-secondary: #39c4b8;
+        --border: #7e4c3a;
+        --danger: #ff6b6b;
+        --control-bg: #2b1a11;
+        --control-border: #9d6b3f;
+        --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.9);
+        --wood-border: #2a180d;
+      }
+    }
+
+    body.light-theme {
+      --bg: #24160f;
+      --bg-card: #f2dfc0;
+      --bg-card-inner: #f7ebd3;
+      --text: #2b1b11;
+      --text-muted: #7a6350;
+      --accent: #f4a462;
+      --accent-strong: #e48835;
+      --accent-soft: #f4c58b;
+      --accent-secondary: #2a9d90;
+      --border: #7e4c3a;
+      --danger: #c0392b;
+      --control-bg: #f7ebd3;
+      --control-border: #c9a57d;
+      --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.55);
+      --wood-border: #4b2b16;
+    }
+
+    body.dark-theme {
+      --bg: #120c08;
+      --bg-card: #322018;
+      --bg-card-inner: #24150f;
+      --text: #f8ecd7;
+      --text-muted: #e0c49b;
+      --accent: #f4a462;
+      --accent-strong: #ffb862;
+      --accent-soft: #7e4c3a;
+      --accent-secondary: #39c4b8;
+      --border: #a77445;
+      --danger: #ff6b6b;
+      --control-bg: #2b1a11;
+      --control-border: #a77445;
+      --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.9);
+      --wood-border: #2a180d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .page-wrapper {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .page-title {
+      text-align: center;
+      font-family: "Cinzel", "Poppins", system-ui, sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      font-size: 22px;
+      text-transform: uppercase;
+      color: #f8e1a8;
+    }
+
+    .frame {
+      width: 100%;
+      border-radius: 24px;
+      padding: 10px;
+      background: linear-gradient(135deg, #5b3318, #8b5a2b);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.7);
+    }
+
+    body.dark-theme .frame {
+      background: linear-gradient(135deg, #3a210f, #704225);
+    }
+
+    .app-shell {
+      width: 100%;
+      background: var(--bg-card);
+      border-radius: 16px;
+      box-shadow: var(--shadow-soft);
+      border: 2px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 8px 14px;
+      background: var(--bg-card);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.45);
+      background: var(--bg-card-inner);
+      color: var(--text);
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.07s;
+    }
+
+    .theme-toggle span.icon { font-size: 14px; }
+
+    .theme-toggle:hover { background: #e9d7b7; }
+    body.dark-theme .theme-toggle:hover { background: #3a2415; }
+
+    .theme-toggle:active { transform: translateY(1px); }
+
+    .app-body {
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+      background: var(--bg-card-inner);
+    }
+
+    #setupContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .setup-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      align-items: flex-end;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 160px;
+      flex: 1 1 160px;
+      max-width: 260px;
+    }
+
+    .field-group label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .field-group select,
+    .field-group input[type="text"] {
+      padding: 7px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--control-border);
+      background: var(--control-bg);
+      color: var(--text);
+      font-size: 14px;
+      width: 100%;
+    }
+
+    .field-group select:focus,
+    .field-group input[type="text"]:focus {
+      outline: 2px solid rgba(244,164,98,0.65);
+      border-color: #b87a33;
+    }
+
+    #nomiContainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 6px 12px;
+      margin-top: 4px;
+    }
+
+    .nome-input {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .nome-input label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .primary-btn,
+    .ghost-btn,
+    .danger-btn {
+      padding: 7px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.4);
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s, transform 0.07s;
+    }
+
+    .primary-btn {
+      background: var(--accent);
+      color: #261506;
+    }
+
+    .ghost-btn {
+      background: var(--bg-card-inner);
+      color: #3b220e;
+    }
+
+    .danger-btn {
+      background: #e36b5a;
+      color: #220806;
+    }
+
+    .primary-btn:hover { background: var(--accent-strong); }
+    .ghost-btn:hover { background: #efe0c7; }
+    .danger-btn:hover { background: #cf5a4a; }
+
+    .primary-btn:active,
+    .ghost-btn:active,
+    .danger-btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-icon {
+      font-size: 12px;
+      font-weight: 600;
+      color: #000;
+    }
+
+    .setup-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-start;
+      margin-top: 4px;
+    }
+
+    #tabellaContainer {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.2);
+      background: var(--bg-card-inner);
+      min-height: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 420px;
+    }
+
+    th, td {
+      border-bottom: 1px solid rgba(0,0,0,0.12);
+      padding: 8px 8px;
+      text-align: center;
+      font-size: 13px;
+      white-space: nowrap;
+      color: var(--text);
+    }
+
+    th {
+      background: #e3c89a;
+      font-weight: 600;
+    }
+
+    tfoot td {
+      font-weight: 600;
+      background: #d9b87f;
+    }
+
+    body.dark-theme th {
+      background: #4b2e1a;
+      color: #fbe7c4;
+    }
+
+    body.dark-theme tfoot td {
+      background: #3b2415;
+      color: #fbe7c4;
+    }
+
+    td:first-child,
+    th:first-child {
+      text-align: left;
+      padding-left: 10px;
+      white-space: nowrap;
+    }
+
+    select.score-select {
+      padding: 4px 6px;
+      border-radius: 999px;
+      border: 1px solid var(--control-border);
+      background: var(--control-bg);
+      font-size: 13px;
+      color: var(--text);
+      min-width: 46px;
+      cursor: pointer;
+    }
+
+    select.score-select:focus {
+      outline: 2px solid rgba(244,164,98,0.8);
+      border-color: #b26828;
+    }
+
+    #controls {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .page-footer {
+      font-size: 11px;
+      color: #bba48b;
+      text-align: center;
+      opacity: 0.85;
+    }
+
+    .risultati-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .risultati-box {
+      background: var(--bg-card-inner);
+      border-radius: 14px;
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      min-width: 260px;
+      max-width: 90vw;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    .risultati-testo {
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    #confetti-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 60;
+    }
+
+    .confetti {
+      position: absolute;
+      top: -10px;
+      font-size: 18px;
+      animation: confetti-fall linear 2.5s forwards;
+    }
+
+    @keyframes confetti-fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    body.dark-theme .primary-btn {
+      background: #f4a462;
+      color: #1b1008;
+      border-color: #b87a33;
+    }
+
+    body.dark-theme .ghost-btn {
+      background: #3a2415;
+      color: #fbe7c4;
+      border-color: #b87a33;
+    }
+
+    body.dark-theme .danger-btn {
+      background: #e36b5a;
+      color: #1b0503;
+      border-color: #b84733;
+    }
+
+    body.dark-theme .primary-btn:hover { background: #ffb872; }
+    body.dark-theme .ghost-btn:hover { background: #4a2e1d; }
+    body.dark-theme .danger-btn:hover { background: #f17866; }
+
+    /* STORICO */
+    .history-panel {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.04);
+      border: 1px solid rgba(0,0,0,0.12);
+      font-size: 12px;
+    }
+
+    body.dark-theme .history-panel {
+      background: rgba(0,0,0,0.35);
+      border-color: rgba(255,255,255,0.08);
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
+    .history-title {
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .history-actions button,
+    .history-actions label {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.25);
+      background: var(--bg-card-inner);
+      cursor: pointer;
+    }
+
+    body.dark-theme .history-actions button,
+    body.dark-theme .history-actions label {
+      background: #3a2415;
+      border-color: rgba(255,255,255,0.15);
+      color: var(--text);
+    }
+
+    #historyFilter {
+      font-size: 11px;
+      padding: 3px 6px;
+      border-radius: 999px;
+      border: 1px solid var(--control-border);
+      background: var(--control-bg);
+      max-width: 200px;
+    }
+
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 4px;
+      font-size: 11px;
+    }
+
+    .history-table th,
+    .history-table td {
+      border: 1px solid rgba(0,0,0,0.15);
+      padding: 4px 6px;
+      text-align: left;
+    }
+
+    .history-table th {
+      background: rgba(0,0,0,0.06);
+    }
+
+    body.dark-theme .history-table th {
+      background: rgba(0,0,0,0.5);
+    }
+
+    @media (max-width: 480px) {
+      th, td {
+        font-size: 12px;
+      }
+      .history-table {
+        font-size: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="page-title">SEGNAPUNTI</div>
+
+    <div class="frame">
+      <div class="app-shell">
+        <header class="app-header">
+          <button id="themeToggle" class="theme-toggle" type="button">
+            <span class="icon" id="themeIcon">☾</span>
+            <span id="themeLabel">Tema sistema</span>
+          </button>
+        </header>
+
+        <main class="app-body">
+          <div id="setupContainer">
+            <div class="setup-row">
+              <div class="field-group">
+                <label for="numPartecipanti">Numero partecipanti</label>
+                <select id="numPartecipanti">
+                  <option value="1">1</option>
+                  <option value="2" selected>2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label for="numPartite">Numero partite iniziali</label>
+                <select id="numPartite">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3" selected>3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                </select>
+              </div>
+
+              <div class="setup-actions">
+                <button id="generaNomi" class="ghost-btn" type="button">
+                  <span class="btn-icon">◎</span> Nomi giocatori
+                </button>
+                <button id="generaTabella" class="primary-btn" type="button">
+                  <span class="btn-icon">►</span> Inizia partita
+                </button>
+              </div>
+            </div>
+
+            <div id="nomiContainer"></div>
+          </div>
+
+          <div id="tabellaContainer"></div>
+
+          <div id="controls" style="display:none;">
+            <button id="aggiungiPartitaBtn" class="ghost-btn" type="button">
+              <span class="btn-icon">＋</span> Aggiungi partita
+            </button>
+            <button id="rimuoviPartitaBtn" class="ghost-btn" type="button">
+              <span class="btn-icon">−</span> Rimuovi ultima partita
+            </button>
+            <button id="nuovaPartitaBtn" class="ghost-btn" type="button">
+              <span class="btn-icon">◎</span> Nuovo set
+            </button>
+            <button id="resetBtn" class="danger-btn" type="button">
+              <span class="btn-icon">↺</span> Reset completo
+            </button>
+            <button id="risultatiBtn" class="primary-btn" type="button" style="display:none;">
+              <span class="btn-icon">★</span> Risultati &amp; salva
+            </button>
+          </div>
+
+          <!-- STORICO -->
+          <section class="history-panel">
+            <div class="history-header">
+              <div class="history-title">Storico partite (locale)</div>
+              <div class="history-actions">
+                <select id="historyFilter">
+                  <option value="">Tutti i giocatori</option>
+                </select>
+                <button id="exportHistoryBtn" type="button">Esporta</button>
+                <label>
+                  Importa
+                  <input id="importHistoryInput" type="file" accept="application/json" style="display:none;">
+                </label>
+                <button id="clearHistoryBtn" type="button">Svuota storico</button>
+              </div>
+            </div>
+            <div id="historyEmpty" style="font-size:11px;color:var(--text-muted);">
+              Nessuna partita salvata.
+            </div>
+            <table id="historyTable" class="history-table" style="display:none;">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Vincitore</th>
+                  <th>Punti</th>
+                  <th>Giocatori</th>
+                </tr>
+              </thead>
+              <tbody id="historyTbody"></tbody>
+            </table>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      &copy; Massimiliano Piazza
+    </div>
+  </div>
+
+  <div id="risultatiOverlay" class="risultati-overlay" style="display:none;">
+    <div class="risultati-box">
+      <div id="risultatiTesto" class="risultati-testo"></div>
+      <button id="chiudiRisultatiBtn" class="ghost-btn" type="button">Chiudi</button>
+    </div>
+  </div>
+
+  <div id="confetti-container"></div>
+
+  <script>
+    // ---- RIFERIMENTI DOM ----
+    const numPartecipantiInput = document.getElementById('numPartecipanti');
+    const numPartiteInput = document.getElementById('numPartite');
+    const generaNomiBtn = document.getElementById('generaNomi');
+    const generaTabellaBtn = document.getElementById('generaTabella');
+    const nomiContainer = document.getElementById('nomiContainer');
+    const tabellaContainer = document.getElementById('tabellaContainer');
+    const setupContainer = document.getElementById('setupContainer');
+    const controlsDiv = document.getElementById('controls');
+    const aggiungiPartitaBtn = document.getElementById('aggiungiPartitaBtn');
+    const rimuoviPartitaBtn = document.getElementById('rimuoviPartitaBtn');
+    const nuovaPartitaBtn = document.getElementById('nuovaPartitaBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const risultatiBtn = document.getElementById('risultatiBtn');
+    const risultatiOverlay = document.getElementById('risultatiOverlay');
+    const risultatiTesto = document.getElementById('risultatiTesto');
+    const chiudiRisultatiBtn = document.getElementById('chiudiRisultatiBtn');
+    const confettiContainer = document.getElementById('confetti-container');
+
+    const historyEmptyEl = document.getElementById('historyEmpty');
+    const historyTableEl = document.getElementById('historyTable');
+    const historyTbodyEl = document.getElementById('historyTbody');
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+    const exportHistoryBtn = document.getElementById('exportHistoryBtn');
+    const importHistoryInput = document.getElementById('importHistoryInput');
+    const historyFilterSelect = document.getElementById('historyFilter');
+
+    const HISTORY_KEY = 'segnapuntiStorico';
+
+    let nomiCorrenti = [];
+    let numPartecipantiCorrente = 0;
+    let numPartiteCorrenti = 0; // numero colonne/partite
+    let totaliCorrenti = [];
+
+    // ---- GENERAZIONE NOMI ----
+    generaNomiBtn.addEventListener('click', () => {
+      const n = parseInt(numPartecipantiInput.value, 10);
+      nomiContainer.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        const div = document.createElement('div');
+        div.className = 'nome-input';
+        const label = document.createElement('label');
+        label.textContent = 'Nome partecipante ' + (i + 1);
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'nome_' + i;
+        input.placeholder = 'Partecipante ' + (i + 1);
+        div.appendChild(label);
+        div.appendChild(input);
+        nomiContainer.appendChild(div);
+      }
+    });
+
+    // ---- GENERA TABELLA (righe=giocatori, colonne=partite) ----
+    generaTabellaBtn.addEventListener('click', () => {
+      const nPartecipanti = parseInt(numPartecipantiInput.value, 10);
+      const nPartite = parseInt(numPartiteInput.value, 10);
+
+      const nomi = [];
+      for (let i = 0; i < nPartecipanti; i++) {
+        const input = document.getElementById('nome_' + i);
+        const nome = (input && input.value.trim()) ? input.value.trim() : ('Partecipante ' + (i + 1));
+        nomi.push(nome);
+      }
+
+      nomiCorrenti = nomi;
+      numPartecipantiCorrente = nPartecipanti;
+      numPartiteCorrenti = nPartite;
+
+      generaTabella();
+      setupContainer.style.display = 'none';
+      controlsDiv.style.display = 'flex';
+    });
+
+    function generaTabella() {
+      tabellaContainer.innerHTML = '';
+
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const tbody = document.createElement('tbody');
+
+      // Header
+      const hr = document.createElement('tr');
+      const thGioc = document.createElement('th');
+      thGioc.textContent = 'Giocatore';
+      hr.appendChild(thGioc);
+
+      for (let p = 0; p < numPartiteCorrenti; p++) {
+        const th = document.createElement('th');
+        th.textContent = 'Partita ' + (p + 1);
+        hr.appendChild(th);
+      }
+
+      const thTot = document.createElement('th');
+      thTot.textContent = 'Totale';
+      hr.appendChild(thTot);
+      thead.appendChild(hr);
+
+      // Righe giocatori
+      nomiCorrenti.forEach((nome, r) => {
+        const tr = document.createElement('tr');
+
+        const tdNome = document.createElement('td');
+        tdNome.textContent = nome;
+        tr.appendChild(tdNome);
+
+        for (let p = 0; p < numPartiteCorrenti; p++) {
+          const td = document.createElement('td');
+          const sel = document.createElement('select');
+          sel.className = `score-select row-${r} partita-${p}`;
+
+          for (let v = 0; v <= 8; v++) {
+            const opt = document.createElement('option');
+            opt.value = v;
+            opt.textContent = v;
+            sel.appendChild(opt);
+          }
+
+          sel.addEventListener('change', () => {
+            aggiornaTotaleRiga(r);
+            applicaVincoloColonna(p);
+            controllaFinePartita();
+          });
+
+          td.appendChild(sel);
+          tr.appendChild(td);
+        }
+
+        const tdTot = document.createElement('td');
+        tdTot.id = 'totale_row_' + r;
+        tdTot.textContent = '0';
+        tr.appendChild(tdTot);
+
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(thead);
+      table.appendChild(tbody);
+      tabellaContainer.appendChild(table);
+
+      // vincoli e totali iniziali
+      for (let p = 0; p < numPartiteCorrenti; p++) {
+        applicaVincoloColonna(p);
+      }
+      for (let r = 0; r < numPartecipantiCorrente; r++) {
+        aggiornaTotaleRiga(r);
+      }
+      controllaFinePartita();
+    }
+
+    // ---- VINCOLO: un solo punteggio >0 per partita (colonna) ----
+    function applicaVincoloColonna(partitaIndex) {
+      const selects = document.querySelectorAll(`select.partita-${partitaIndex}`);
+      if (!selects.length) return;
+
+      const usati = new Set();
+      selects.forEach(sel => {
+        const v = parseInt(sel.value || '0', 10);
+        if (v > 0) usati.add(v.toString());
+      });
+
+      selects.forEach(sel => {
+        const current = sel.value;
+        const options = sel.querySelectorAll('option');
+        options.forEach(opt => {
+          if (opt.value === '0') {
+            opt.disabled = false;
+          } else if (opt.value === current) {
+            opt.disabled = false;
+          } else {
+            opt.disabled = usati.has(opt.value);
+          }
+        });
+      });
+    }
+
+    // ---- TOTALE PER GIOCATORE (riga) ----
+    function aggiornaTotaleRiga(riga) {
+      const selects = document.querySelectorAll(`select.row-${riga}`);
+      let sum = 0;
+      selects.forEach(sel => sum += parseInt(sel.value || '0', 10));
+      totaliCorrenti[riga] = sum;
+      const tdTot = document.getElementById('totale_row_' + riga);
+      if (tdTot) tdTot.textContent = sum;
+    }
+
+    function aggiornaTuttiITotali() {
+      totaliCorrenti = [];
+      for (let r = 0; r < numPartecipantiCorrente; r++) {
+        aggiornaTotaleRiga(r);
+      }
+    }
+
+    // ---- CONTROLLA FINE PARTITA ----
+    function controllaFinePartita() {
+      const selects = tabellaContainer.querySelectorAll('select.score-select');
+      if (!selects.length) return;
+      let allNonZero = true;
+      selects.forEach(sel => {
+        if (parseInt(sel.value || '0', 10) === 0) {
+          allNonZero = false;
+        }
+      });
+      risultatiBtn.style.display = allNonZero ? 'inline-flex' : 'none';
+    }
+
+    // ---- AGGIUNGI / RIMUOVI PARTITE (COLONNE) ----
+    aggiungiPartitaBtn.addEventListener('click', () => {
+      if (!tabellaContainer.querySelector('table')) return;
+      if (numPartiteCorrenti >= 50) {
+        alert('Limite massimo 50 partite per set.');
+        return;
+      }
+      numPartiteCorrenti += 1;
+      aggiungiColonnaPartita(numPartiteCorrenti - 1);
+      controllaFinePartita();
+    });
+
+    function aggiungiColonnaPartita(index) {
+      const table = tabellaContainer.querySelector('table');
+      if (!table) return;
+      const theadRow = table.querySelector('thead tr');
+      const tbody = table.querySelector('tbody');
+
+      // aggiungi header prima della colonna Totale (ultima)
+      const thTot = theadRow.lastElementChild;
+      const th = document.createElement('th');
+      th.textContent = 'Partita ' + (index + 1);
+      theadRow.insertBefore(th, thTot);
+
+      // per ogni riga giocatore aggiungi select prima del totale
+      Array.from(tbody.rows).forEach((tr, r) => {
+        const tdTot = tr.lastElementChild;
+        const td = document.createElement('td');
+        const sel = document.createElement('select');
+        sel.className = `score-select row-${r} partita-${index}`;
+        for (let v = 0; v <= 8; v++) {
+          const opt = document.createElement('option');
+          opt.value = v;
+          opt.textContent = v;
+          sel.appendChild(opt);
+        }
+        sel.addEventListener('change', () => {
+          aggiornaTotaleRiga(r);
+          applicaVincoloColonna(index);
+          controllaFinePartita();
+        });
+        td.appendChild(sel);
+        tr.insertBefore(td, tdTot);
+      });
+
+      applicaVincoloColonna(index);
+      aggiornaTuttiITotali();
+    }
+
+    rimuoviPartitaBtn.addEventListener('click', () => {
+      if (!tabellaContainer.querySelector('table')) return;
+      if (numPartiteCorrenti <= 1) {
+        alert('Deve rimanere almeno una partita.');
+        return;
+      }
+      const lastIndex = numPartiteCorrenti - 1;
+      if (!colonnaVuota(lastIndex)) {
+        alert('Puoi rimuovere solo l’ultima partita se tutti i punteggi sono 0.');
+        return;
+      }
+      rimuoviColonnaPartita(lastIndex);
+      numPartiteCorrenti -= 1;
+      aggiornaTuttiITotali();
+      controllaFinePartita();
+    });
+
+    function colonnaVuota(index) {
+      const selects = document.querySelectorAll(`select.partita-${index}`);
+      if (!selects.length) return true;
+      return Array.from(selects).every(sel => parseInt(sel.value || '0', 10) === 0);
+    }
+
+    function rimuoviColonnaPartita(index) {
+      const table = tabellaContainer.querySelector('table');
+      if (!table) return;
+      const theadRow = table.querySelector('thead tr');
+      const tbody = table.querySelector('tbody');
+
+      // rimuovi header (colonna # index+1: Giocatore è 0)
+      const thToRemove = theadRow.children[index + 1];
+      if (thToRemove) theadRow.removeChild(thToRemove);
+
+      // rimuovi cella in ogni riga
+      Array.from(tbody.rows).forEach(tr => {
+        const tdToRemove = tr.children[index + 1];
+        if (tdToRemove) tr.removeChild(tdToRemove);
+      });
+    }
+
+    // ---- NUOVO SET E RESET ----
+    nuovaPartitaBtn.addEventListener('click', () => {
+      if (!nomiCorrenti.length) return;
+      const nuovoNumero = prompt('Numero totale di partite per il nuovo set? (1-10)');
+      const nPartite = parseInt(nuovoNumero, 10);
+      if (!nPartite || nPartite < 1 || nPartite > 50) return;
+      numPartiteCorrenti = nPartite;
+      generaTabella();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      nomiCorrenti = [];
+      numPartecipantiCorrente = 0;
+      numPartiteCorrenti = 0;
+      totaliCorrenti = [];
+      tabellaContainer.innerHTML = '';
+      nomiContainer.innerHTML = '';
+      numPartecipantiInput.value = '2';
+      numPartiteInput.value = '3';
+      setupContainer.style.display = 'flex';
+      controlsDiv.style.display = 'none';
+      risultatiOverlay.style.display = 'none';
+      risultatiBtn.style.display = 'none';
+      if (confettiContainer) confettiContainer.innerHTML = '';
+    });
+
+    // ---- RISULTATI + STORICO ----
+    risultatiBtn.addEventListener('click', () => {
+      if (!totaliCorrenti.length || !nomiCorrenti.length) return;
+
+      const min = Math.min(...totaliCorrenti);
+      const winnerIndex = totaliCorrenti.indexOf(min);
+      const winnerName = nomiCorrenti[winnerIndex] || ('Partecipante ' + (winnerIndex + 1));
+
+      risultatiTesto.textContent = `Vincitore: ${winnerName} con ${min} punti`;
+      risultatiOverlay.style.display = 'flex';
+      lanciaConfetti();
+
+      salvaRisultatoStorico(winnerName, min);
+      renderStorico();
+    });
+
+    chiudiRisultatiBtn.addEventListener('click', () => {
+      risultatiOverlay.style.display = 'none';
+    });
+
+    function lanciaConfetti() {
+      if (!confettiContainer) return;
+      confettiContainer.innerHTML = '';
+      const colori = ['🎉', '✨', '🎊', '⭐'];
+      const quanti = 40;
+
+      for (let i = 0; i < quanti; i++) {
+        const conf = document.createElement('div');
+        conf.className = 'confetti';
+        conf.textContent = colori[i % colori.length];
+        conf.style.left = Math.random() * 100 + 'vw';
+        conf.style.animationDelay = (Math.random() * 0.7) + 's';
+        confettiContainer.appendChild(conf);
+        setTimeout(() => conf.remove(), 3000);
+      }
+    }
+
+    // ---- STORICO LOCALSTORAGE + EXPORT/IMPORT ----
+    function caricaStorico() {
+      try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        console.error('Errore lettura storico', e);
+        return [];
+      }
+    }
+
+    function salvaStorico(arr) {
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
+      } catch (e) {
+        console.error('Errore salvataggio storico', e);
+      }
+    }
+
+    function salvaRisultatoStorico(nomeVincitore, punteggio) {
+      const storico = caricaStorico();
+      const now = new Date();
+      const record = {
+        vincitore: nomeVincitore,
+        punteggio,
+        giocatori: nomiCorrenti.slice(),
+        dataISO: now.toISOString()
+      };
+      storico.push(record);
+      const trimmed = storico.slice(-200);
+      salvaStorico(trimmed);
+    }
+
+    function formattaDataBreve(iso) {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return '';
+      return d.toLocaleString('it-IT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function aggiornaFiltroGiocatori(storico) {
+      const tutti = new Set();
+      storico.forEach(rec => {
+        (rec.giocatori || []).forEach(n => {
+          if (n && typeof n === 'string') tutti.add(n);
+        });
+      });
+
+      const selected = historyFilterSelect.value;
+      historyFilterSelect.innerHTML = '';
+      const optAll = document.createElement('option');
+      optAll.value = '';
+      optAll.textContent = 'Tutti i giocatori';
+      historyFilterSelect.appendChild(optAll);
+
+      Array.from(tutti).sort().forEach(nome => {
+        const opt = document.createElement('option');
+        opt.value = nome;
+        opt.textContent = nome;
+        historyFilterSelect.appendChild(opt);
+      });
+
+      if (selected && Array.from(tutti).includes(selected)) {
+        historyFilterSelect.value = selected;
+      } else {
+        historyFilterSelect.value = '';
+      }
+    }
+
+    function renderStorico() {
+      const storico = caricaStorico();
+      const filtro = historyFilterSelect.value || '';
+
+      if (!storico.length) {
+        historyEmptyEl.style.display = 'block';
+        historyTableEl.style.display = 'none';
+        aggiornaFiltroGiocatori(storico);
+        return;
+      }
+
+      historyEmptyEl.style.display = 'none';
+      historyTableEl.style.display = 'table';
+
+      aggiornaFiltroGiocatori(storico);
+
+      let records = storico.slice().reverse(); // più recenti in alto
+      if (filtro) {
+        records = records.filter(rec =>
+          (rec.giocatori || []).includes(filtro)
+        );
+      }
+
+      historyTbodyEl.innerHTML = '';
+      records.forEach(rec => {
+        const tr = document.createElement('tr');
+
+        const tdData = document.createElement('td');
+        tdData.textContent = formattaDataBreve(rec.dataISO);
+        tr.appendChild(tdData);
+
+        const tdVinc = document.createElement('td');
+        tdVinc.textContent = rec.vincitore || '';
+        tr.appendChild(tdVinc);
+
+        const tdPunti = document.createElement('td');
+        tdPunti.textContent = rec.punteggio != null ? rec.punteggio : '';
+        tr.appendChild(tdPunti);
+
+        const tdGioc = document.createElement('td');
+        tdGioc.textContent = (rec.giocatori || []).join(', ');
+        tr.appendChild(tdGioc);
+
+        historyTbodyEl.appendChild(tr);
+      });
+    }
+
+    clearHistoryBtn.addEventListener('click', () => {
+      if (!confirm('Sicuro di voler svuotare lo storico locale delle partite?')) return;
+      salvaStorico([]);
+      renderStorico();
+    });
+
+    historyFilterSelect.addEventListener('change', () => {
+      renderStorico();
+    });
+
+    exportHistoryBtn.addEventListener('click', () => {
+      const storico = caricaStorico();
+      const blob = new Blob([JSON.stringify(storico, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'segnapunti-storico.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    importHistoryInput.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (!Array.isArray(data)) {
+            alert('File non valido: ci si aspetta un array JSON.');
+            return;
+          }
+          salvaStorico(data);
+          renderStorico();
+        } catch (err) {
+          console.error(err);
+          alert('Errore durante la lettura del file JSON.');
+        }
+      };
+      reader.readAsText(file);
+      importHistoryInput.value = '';
+    });
+
+    // ---- TEMA ----
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeLabel = document.getElementById('themeLabel');
+
+    function getSystemTheme() {
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+    }
+
+    function applyTheme(theme, fromSystem = false) {
+      document.body.classList.remove('light-theme', 'dark-theme');
+      if (theme === 'light') {
+        document.body.classList.add('light-theme');
+        themeIcon.textContent = '☾';
+        themeLabel.textContent = fromSystem ? 'Tema sistema (chiaro)' : 'Tema chiaro';
+      } else {
+        document.body.classList.add('dark-theme');
+        themeIcon.textContent = '☼';
+        themeLabel.textContent = fromSystem ? 'Tema sistema (scuro)' : 'Tema scuro';
+      }
+    }
+
+    function initTheme() {
+      const stored = localStorage.getItem('segnapunti-theme');
+      if (stored === 'light' || stored === 'dark') {
+        applyTheme(stored, false);
+      } else {
+        const system = getSystemTheme();
+        applyTheme(system, true);
+      }
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      const current = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next, false);
+      localStorage.setItem('segnapunti-theme', next);
+    });
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      const stored = localStorage.getItem('segnapunti-theme');
+      if (stored === 'light' || stored === 'dark') return;
+      const systemTheme = e.matches ? 'dark' : 'light';
+      applyTheme(systemTheme, true);
+    });
+
+    // init
+    initTheme();
+    renderStorico();
+  </script>
+</body>
+</html>
