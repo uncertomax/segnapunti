@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Segnapunti</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #24160f;
+      --bg-card: #f2dfc0;
+      --bg-card-inner: #f7ebd3;
+      --text: #2b1b11;
+      --text-muted: #7a6350;
+      --accent: #f4a462;
+      --accent-strong: #e48835;
+      --accent-soft: #f4c58b;
+      --accent-secondary: #2a9d90;
+      --border: #7e4c3a;
+      --danger: #c0392b;
+      --control-bg: #f7ebd3;
+      --control-border: #c9a57d;
+      --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.55);
+      --wood-border: #4b2b16;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #120c08;
+        --bg-card: #322018;
+        --bg-card-inner: #24150f;
+        --text: #f6ebd6;
+        --text-muted: #e0c49b;
+        --accent: #f4a462;
+        --accent-strong: #ffb862;
+        --accent-soft: #7e4c3a;
+        --accent-secondary: #39c4b8;
+        --border: #7e4c3a;
+        --danger: #ff6b6b;
+        --control-bg: #2b1a11;
+        --control-border: #9d6b3f;
+        --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.9);
+        --wood-border: #2a180d;
+      }
+    }
+
+    body.light-theme {
+      --bg: #24160f;
+      --bg-card: #f2dfc0;
+      --bg-card-inner: #f7ebd3;
+      --text: #2b1b11;
+      --text-muted: #7a6350;
+      --accent: #f4a462;
+      --accent-strong: #e48835;
+      --accent-soft: #f4c58b;
+      --accent-secondary: #2a9d90;
+      --border: #7e4c3a;
+      --danger: #c0392b;
+      --control-bg: #f7ebd3;
+      --control-border: #c9a57d;
+      --shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.55);
+      --wood-border: #4b2b16;
+    }
+
+    body.dark-theme {
+      --bg: #120c08;
+      --bg-card: #322018;
+      --bg-card-inner: #24150f;
+      --text: #f8ecd7;
+      --text-muted: #e0c49b;
+      --accent: #f4a462;
+      --accent-strong: #ffb862;
+      --accent-soft: #7e4c3a;
+      --accent-secondary: #39c4b8;
+      --border: #a77445;
+      --danger: #ff6b6b;
+      --control-bg: #2b1a11;
+      --control-border: #a77445;
+      --shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.9);
+      --wood-border: #2a180d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .page-wrapper {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .page-title {
+      text-align: center;
+      font-family: "Cinzel", "Poppins", system-ui, sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      font-size: 22px;
+      text-transform: uppercase;
+      color: #f8e1a8;
+    }
+
+    .frame {
+      width: 100%;
+      border-radius: 24px;
+      padding: 10px;
+      background: linear-gradient(135deg, #5b3318, #8b5a2b);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.7);
+    }
+
+    body.dark-theme .frame {
+      background: linear-gradient(135deg, #3a210f, #704225);
+    }
+
+    .app-shell {
+      width: 100%;
+      background: var(--bg-card);
+      border-radius: 16px;
+      box-shadow: var(--shadow-soft);
+      border: 2px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 8px 14px;
+      background: var(--bg-card);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.45);
+      background: var(--bg-card-inner);
+      color: var(--text);
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.07s;
+    }
+
+    .theme-toggle span.icon { font-size: 14px; }
+
+    .theme-toggle:hover { background: #e9d7b7; }
+    body.dark-theme .theme-toggle:hover { background: #3a2415; }
+
+    .theme-toggle:active { transform: translateY(1px); }
+
+    .app-body {
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+      background: var(--bg-card-inner);
+    }
+
+    #setupContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .setup-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      align-items: flex-end;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 160px;
+      flex: 1 1 160px;
+      max-width: 260px;
+    }
+
+    .field-group label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .field-group select,
+    .field-group input[type="text"] {
+      padding: 7px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--control-border);
+      background: var(--control-bg);
+      color: var(--text);
+      font-size: 14px;
+      width: 100%;
+    }
+
+    .field-group select:focus,
+    .field-group input[type="text"]:focus {
+      outline: 2px solid rgba(244,164,98,0.65);
+      border-color: #b87a33;
+    }
+
+    #nomiContainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 6px 12px;
+      margin-top: 4px;
+    }
+
+    .nome-input {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .nome-input label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .primary-btn,
+    .ghost-btn,
+    .danger-btn {
+      padding: 7px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,0.4);
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: background 0.15s, color 0.15s, transform 0.07s;
+    }
+
+    .primary-btn {
+      background: var(--accent);
+      color: #261506;
+    }
+
+    .ghost-btn {
+      background: var(--bg-card-inner);
+      color: #3b220e;
+    }
+
+    .danger-btn {
+      background: #e36b5a;
+      color: #220806;
+    }
+
+    .primary-btn:hover { background: var(--accent-strong); }
+    .ghost-btn:hover { background: #efe0c7; }
+    .danger-btn:hover { background: #cf5a4a; }
+
+    .primary-btn:active,
+    .ghost-btn:active,
+    .danger-btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-icon {
+      font-size: 12px;
+      font-weight: 600;
+      color: #000;
+    }
+
+    .setup-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-start;
+      margin-top: 4px;
+    }
+
+    #tabellaContainer {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.2);
+      background: var(--bg-card-inner);
+      min-height: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 420px;
+    }
+
+    th, td {
+      border-bottom: 1px solid rgba(0,0,0,0.12);
+      padding: 9px 10px;
+      text-align: center;
+      font-size: 13px;
+      white-space: nowrap;
+      color: var(--text);
+    }
+
+    th {
+      background: #e3c89a;
+      font-weight: 600;
+    }
+
+    tfoot td {
+      font-weight: 600;
+      background: #d9b87f;
+    }
+
+    body.dark-theme th {
+      background: #4b2e1a;
+      color: #fbe7c4;
+    }
+
+    body.dark-theme tfoot td {
+      background: #3b2415;
+      color: #fbe7c4;
+    }
+
+    td:first-child,
+    th:first-child {
+      text-align: left;
+      padding-left: 14px;
+      white-space: nowrap;
+    }
+
+    select.score-select {
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--control-border);
+      background: var(--control-bg);
+      font-size: 13px;
+      color: var(--text);
+      min-width: 50px;
+      cursor: pointer;
+    }
+
+    select.score-select:focus {
+      outline: 2px solid rgba(244,164,98,0.8);
+      border-color: #b26828;
+    }
+
+    #controls {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .page-footer {
+      font-size: 11px;
+      color: #bba48b;
+      text-align: center;
+      opacity: 0.85;
+    }
+
+    .risultati-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .risultati-box {
+      background: var(--bg-card-inner);
+      border-radius: 14px;
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      min-width: 260px;
+      max-width: 90vw;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    .risultati-testo {
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    #confetti-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 60;
+    }
+
+    .confetti {
+      position: absolute;
+      top: -10px;
+      font-size: 18px;
+      animation: confetti-fall linear 2.5s forwards;
+    }
+
+    @keyframes confetti-fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    body.dark-theme .primary-btn {
+      background: #f4a462;
+      color: #1b1008;
+      border-color: #b87a33;
+    }
+
+    body.dark-theme .ghost-btn {
+      background: #3a2415;
+      color: #fbe7c4;
+      border-color: #b87a33;
+    }
+
+    body.dark-theme .danger-btn {
+      background: #e36b5a;
+      color: #1b0503;
+      border-color: #b84733;
+    }
+
+    body.dark-theme .primary-btn:hover { background: #ffb872; }
+    body.dark-theme .ghost-btn:hover { background: #4a2e1d; }
+    body.dark-theme .danger-btn:hover { background: #f17866; }
+
+    /* STORICO */
+    .history-panel {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.04);
+      border: 1px solid rgba(0,0,0,0.12);
+      font-size: 12px;
+    }
+
+    body.dark-theme .history-panel {
+      background: rgba(0,0,0,0.35);
+      border-color: rgba(255,255,255,0.08);
+    }
+
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .history-title {
+      font-weight: 600;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .history-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .history-main {
+      font-size: 12px;
+    }
+
+    .history-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 480px) {
+      .history-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="page-title">SEGNAPUNTI</div>
+
+    <div class="frame">
+      <div class="app-shell">
+        <header class="app-header">
+          <button id="themeToggle" class="theme-toggle" type="button">
+            <span class="icon" id="themeIcon">☾</span>
+            <span id="themeLabel">Tema sistema</span>
+          </button>
+        </header>
+
+        <main class="app-body">
+          <div id="setupContainer">
+            <div class="setup-row">
+              <div class="field-group">
+                <label for="numPartecipanti">Numero partecipanti</label>
+                <select id="numPartecipanti">
+                  <option value="1">1</option>
+                  <option value="2" selected>2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label for="numPartite">Numero partite</label>
+                <select id="numPartite">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3" selected>3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                  <option value="10">10</option>
+                </select>
+              </div>
+
+              <div class="setup-actions">
+                <button id="generaNomi" class="ghost-btn" type="button">
+                  <span class="btn-icon">◎</span> Nomi giocatori
+                </button>
+                <button id="generaTabella" class="primary-btn" type="button">
+                  <span class="btn-icon">►</span> Inizia partita
+                </button>
+              </div>
+            </div>
+
+            <div id="nomiContainer"></div>
+          </div>
+
+          <div id="tabellaContainer"></div>
+
+          <div id="controls" style="display:none;">
+            <button id="nuovaPartitaBtn" class="ghost-btn" type="button">
+              <span class="btn-icon">◎</span> Nuovo set
+            </button>
+            <button id="resetBtn" class="danger-btn" type="button">
+              <span class="btn-icon">↺</span> Reset completo
+            </button>
+            <button id="risultatiBtn" class="primary-btn" type="button" style="display:none;">
+              <span class="btn-icon">★</span> Risultati
+            </button>
+          </div>
+
+          <!-- STORICO -->
+          <section class="history-panel">
+            <div class="history-header">
+              <div class="history-title">Storico partite (locale)</div>
+              <button id="clearHistoryBtn" class="ghost-btn" type="button" style="padding:3px 10px;font-size:11px;">
+                Svuota storico
+              </button>
+            </div>
+            <ul id="historyList" class="history-list"></ul>
+            <div id="historyEmpty" style="font-size:11px;color:var(--text-muted);">
+              Nessuna partita salvata.
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <div class="page-footer">
+      &copy; Massimiliano Piazza
+    </div>
+  </div>
+
+  <div id="risultatiOverlay" class="risultati-overlay" style="display:none;">
+    <div class="risultati-box">
+      <div id="risultatiTesto" class="risultati-testo"></div>
+      <button id="chiudiRisultatiBtn" class="ghost-btn" type="button">Chiudi</button>
+    </div>
+  </div>
+
+  <div id="confetti-container"></div>
+
+  <script>
+    const numPartecipantiInput = document.getElementById('numPartecipanti');
+    const numPartiteInput = document.getElementById('numPartite');
+    const generaNomiBtn = document.getElementById('generaNomi');
+    const generaTabellaBtn = document.getElementById('generaTabella');
+    const nomiContainer = document.getElementById('nomiContainer');
+    const tabellaContainer = document.getElementById('tabellaContainer');
+    const setupContainer = document.getElementById('setupContainer');
+    const controlsDiv = document.getElementById('controls');
+    const nuovaPartitaBtn = document.getElementById('nuovaPartitaBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const risultatiBtn = document.getElementById('risultatiBtn');
+    const risultatiOverlay = document.getElementById('risultatiOverlay');
+    const risultatiTesto = document.getElementById('risultatiTesto');
+    const chiudiRisultatiBtn = document.getElementById('chiudiRisultatiBtn');
+    const confettiContainer = document.getElementById('confetti-container');
+
+    const historyListEl = document.getElementById('historyList');
+    const historyEmptyEl = document.getElementById('historyEmpty');
+    const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+    let nomiCorrenti = [];
+    let numPartecipantiCorrente = 0;
+    let totaliCorrenti = [];
+
+    const HISTORY_KEY = 'segnapuntiStorico';
+
+    generaNomiBtn.addEventListener('click', () => {
+      const n = parseInt(numPartecipantiInput.value, 10);
+      nomiContainer.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        const div = document.createElement('div');
+        div.className = 'nome-input';
+        const label = document.createElement('label');
+        label.textContent = 'Nome partecipante ' + (i + 1);
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = 'nome_' + i;
+        input.placeholder = 'Partecipante ' + (i + 1);
+        div.appendChild(label);
+        div.appendChild(input);
+        nomiContainer.appendChild(div);
+      }
+    });
+
+    generaTabellaBtn.addEventListener('click', () => {
+      const nPartecipanti = parseInt(numPartecipantiInput.value, 10);
+      const nPartite = parseInt(numPartiteInput.value, 10);
+
+      const nomi = [];
+      for (let i = 0; i < nPartecipanti; i++) {
+        const input = document.getElementById('nome_' + i);
+        const nome = (input && input.value.trim()) ? input.value.trim() : ('Partecipante ' + (i + 1));
+        nomi.push(nome);
+      }
+
+      nomiCorrenti = nomi;
+      numPartecipantiCorrente = nPartecipanti;
+
+      generaTabella(nomiCorrenti, nPartite);
+
+      setupContainer.style.display = 'none';
+      controlsDiv.style.display = 'flex';
+    });
+
+    function generaTabella(nomi, nPartite) {
+      tabellaContainer.innerHTML = '';
+
+      const nPartecipanti = nomi.length;
+
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const tbody = document.createElement('tbody');
+      const tfoot = document.createElement('tfoot');
+
+      const headerRow = document.createElement('tr');
+      const thVuoto = document.createElement('th');
+      thVuoto.textContent = 'Partita';
+      headerRow.appendChild(thVuoto);
+
+      nomi.forEach(nome => {
+        const th = document.createElement('th');
+        th.textContent = nome;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+
+      for (let r = 0; r < nPartite; r++) {
+        const tr = document.createElement('tr');
+
+        const tdLabel = document.createElement('td');
+        tdLabel.textContent = 'Partita ' + (r + 1);
+        tr.appendChild(tdLabel);
+
+        for (let c = 0; c < nPartecipanti; c++) {
+          const td = document.createElement('td');
+          const select = document.createElement('select');
+          select.className = 'score-select col-' + c;
+
+          for (let val = 0; val <= 8; val++) {
+            const opt = document.createElement('option');
+            opt.value = val;
+            opt.textContent = val;
+            select.appendChild(opt);
+          }
+
+          select.addEventListener('change', () => {
+            aggiornaTotali();
+            applicaVincoloRiga(tr);
+            controllaFinePartita();
+          });
+
+          td.appendChild(select);
+          tr.appendChild(td);
+        }
+
+        tbody.appendChild(tr);
+      }
+
+      const trTotale = document.createElement('tr');
+      const tdLabelTot = document.createElement('td');
+      tdLabelTot.textContent = 'Totale';
+      trTotale.appendChild(tdLabelTot);
+
+      for (let c = 0; c < nPartecipanti; c++) {
+        const td = document.createElement('td');
+        td.id = 'totale_col_' + c;
+        td.textContent = '0';
+        trTotale.appendChild(td);
+      }
+      tfoot.appendChild(trTotale);
+
+      table.appendChild(thead);
+      table.appendChild(tbody);
+      table.appendChild(tfoot);
+      tabellaContainer.appendChild(table);
+
+      risultatiBtn.style.display = 'none';
+
+      const rows = tbody.querySelectorAll('tr');
+      rows.forEach(applicaVincoloRiga);
+
+      aggiornaTotali();
+    }
+
+    function applicaVincoloRiga(tr) {
+      const selects = tr.querySelectorAll('select.score-select');
+      if (!selects.length) return;
+
+      const usati = new Set();
+      selects.forEach(sel => {
+        const v = parseInt(sel.value || '0', 10);
+        if (v > 0) usati.add(v.toString());
+      });
+
+      selects.forEach(sel => {
+        const current = sel.value;
+        const options = sel.querySelectorAll('option');
+        options.forEach(opt => {
+          if (opt.value === '0') {
+            opt.disabled = false;
+          } else if (opt.value === current) {
+            opt.disabled = false;
+          } else {
+            opt.disabled = usati.has(opt.value);
+          }
+        });
+      });
+    }
+
+    function aggiornaTotali() {
+      const nPartecipanti = numPartecipantiCorrente || parseInt(numPartecipantiInput.value, 10) || 0;
+
+      totaliCorrenti = [];
+      for (let c = 0; c < nPartecipanti; c++) {
+        const selects = document.querySelectorAll('select.col-' + c);
+        let sum = 0;
+        selects.forEach(sel => {
+          sum += parseInt(sel.value || '0', 10);
+        });
+        totaliCorrenti[c] = sum;
+        const tdTot = document.getElementById('totale_col_' + c);
+        if (tdTot) tdTot.textContent = sum;
+      }
+    }
+
+    function controllaFinePartita() {
+      const selects = tabellaContainer.querySelectorAll('select.score-select');
+      if (!selects.length) return;
+      let allNonZero = true;
+      selects.forEach(sel => {
+        if (parseInt(sel.value || '0', 10) === 0) {
+          allNonZero = false;
+        }
+      });
+      risultatiBtn.style.display = allNonZero ? 'inline-flex' : 'none';
+    }
+
+    nuovaPartitaBtn.addEventListener('click', () => {
+      if (!nomiCorrenti.length) return;
+      const nuovoNumero = prompt('Quante partite vuoi giocare? (1-10)');
+      const nPartite = parseInt(nuovoNumero, 10);
+      if (!nPartite || nPartite < 1 || nPartite > 10) return;
+      generaTabella(nomiCorrenti, nPartite);
+    });
+
+    resetBtn.addEventListener('click', () => {
+      nomiCorrenti = [];
+      numPartecipantiCorrente = 0;
+      totaliCorrenti = [];
+      tabellaContainer.innerHTML = '';
+      nomiContainer.innerHTML = '';
+      numPartecipantiInput.value = '2';
+      numPartiteInput.value = '3';
+      setupContainer.style.display = 'flex';
+      controlsDiv.style.display = 'none';
+      risultatiOverlay.style.display = 'none';
+      risultatiBtn.style.display = 'none';
+      if (confettiContainer) confettiContainer.innerHTML = '';
+    });
+
+    risultatiBtn.addEventListener('click', () => {
+      if (!totaliCorrenti.length || !nomiCorrenti.length) return;
+
+      const min = Math.min(...totaliCorrenti);
+      const winnerIndex = totaliCorrenti.indexOf(min);
+      const winnerName = nomiCorrenti[winnerIndex] || ('Partecipante ' + (winnerIndex + 1));
+
+      risultatiTesto.textContent = `Vincitore: ${winnerName} con ${min} punti`;
+      risultatiOverlay.style.display = 'flex';
+      lanciaConfetti();
+
+      salvaRisultatoStorico(winnerName, min);
+      renderStorico();
+    });
+
+    chiudiRisultatiBtn.addEventListener('click', () => {
+      risultatiOverlay.style.display = 'none';
+    });
+
+    function lanciaConfetti() {
+      if (!confettiContainer) return;
+      confettiContainer.innerHTML = '';
+      const colori = ['🎉', '✨', '🎊', '⭐'];
+      const quanti = 40;
+
+      for (let i = 0; i < quanti; i++) {
+        const conf = document.createElement('div');
+        conf.className = 'confetti';
+        conf.textContent = colori[i % colori.length];
+        conf.style.left = Math.random() * 100 + 'vw';
+        conf.style.animationDelay = (Math.random() * 0.7) + 's';
+        confettiContainer.appendChild(conf);
+        setTimeout(() => conf.remove(), 3000);
+      }
+    }
+
+    // ---- STORICO LOCALSTORAGE ----
+    function caricaStorico() {
+      try {
+        const raw = localStorage.getItem(HISTORY_KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        console.error('Errore lettura storico', e);
+        return [];
+      }
+    }
+
+    function salvaStorico(arr) {
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
+      } catch (e) {
+        console.error('Errore salvataggio storico', e);
+      }
+    }
+
+    function salvaRisultatoStorico(nomeVincitore, punteggio) {
+      const storico = caricaStorico();
+      const now = new Date();
+      const record = {
+        vincitore: nomeVincitore,
+        punteggio,
+        partecipanti: nomiCorrenti.slice(),
+        numPartecipanti: nomiCorrenti.length,
+        dataISO: now.toISOString()
+      };
+      storico.push(record);
+      // tieni solo gli ultimi 100
+      const trimmed = storico.slice(-100);
+      salvaStorico(trimmed);
+    }
+
+    function formattaDataBreve(iso) {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return '';
+      return d.toLocaleString('it-IT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function renderStorico() {
+      const storico = caricaStorico();
+      historyListEl.innerHTML = '';
+
+      if (!storico.length) {
+        historyEmptyEl.style.display = 'block';
+        return;
+      }
+      historyEmptyEl.style.display = 'none';
+
+      // mostra ultimi 10, dal più recente
+      const ultimi = storico.slice(-10).reverse();
+
+      ultimi.forEach(record => {
+        const li = document.createElement('li');
+        li.className = 'history-item';
+
+        const main = document.createElement('div');
+        main.className = 'history-main';
+        main.textContent = `${record.vincitore} (${record.punteggio} punti)`;
+
+        const meta = document.createElement('div');
+        meta.className = 'history-meta';
+        const altri = (record.partecipanti || []).filter(n => n !== record.vincitore);
+        const altriTxt = altri.length ? ` vs ${altri.join(', ')}` : '';
+        meta.textContent = `${formattaDataBreve(record.dataISO)}${altriTxt}`;
+
+        li.appendChild(main);
+        li.appendChild(meta);
+        historyListEl.appendChild(li);
+      });
+    }
+
+    clearHistoryBtn.addEventListener('click', () => {
+      if (!confirm('Sicuro di voler svuotare lo storico locale delle partite?')) return;
+      salvaStorico([]);
+      renderStorico();
+    });
+
+    // ---- TEMA ----
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeLabel = document.getElementById('themeLabel');
+
+    function getSystemTheme() {
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+    }
+
+    function applyTheme(theme, fromSystem = false) {
+      document.body.classList.remove('light-theme', 'dark-theme');
+      if (theme === 'light') {
+        document.body.classList.add('light-theme');
+        themeIcon.textContent = '☾';
+        themeLabel.textContent = fromSystem ? 'Tema sistema (chiaro)' : 'Tema chiaro';
+      } else {
+        document.body.classList.add('dark-theme');
+        themeIcon.textContent = '☼';
+        themeLabel.textContent = fromSystem ? 'Tema sistema (scuro)' : 'Tema scuro';
+      }
+    }
+
+    function initTheme() {
+      const stored = localStorage.getItem('segnapunti-theme');
+      if (stored === 'light' || stored === 'dark') {
+        applyTheme(stored, false);
+      } else {
+        const system = getSystemTheme();
+        applyTheme(system, true);
+      }
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      const current = document.body.classList.contains('dark-theme') ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next, false);
+      localStorage.setItem('segnapunti-theme', next);
+    });
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      const stored = localStorage.getItem('segnapunti-theme');
+      if (stored === 'light' || stored === 'dark') return;
+      const systemTheme = e.matches ? 'dark' : 'light';
+      applyTheme(systemTheme, true);
+    });
+
+    initTheme();
+    renderStorico();
+  </script>
+</body>
+</html>
